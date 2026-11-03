@@ -1,0 +1,19 @@
+# dataset (download from Kaggle, ~2.7 GB) and generated files
+data/
+cache/
+models/*.joblib
+*.npz
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# editors / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

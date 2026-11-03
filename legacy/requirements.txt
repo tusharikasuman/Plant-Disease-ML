@@ -1,0 +1,10 @@
+# Plant disease ML project: libraries needed to run the notebook / scripts
+# Tested with Python 3.11. Install with:  pip install -r requirements.txt
+# (Google Colab already has all of these; nothing to install there.)
+
+numpy>=1.26          # arrays and maths (tested 2.4.4)
+opencv-python>=4.8   # read images, resize, blur, HSV mask, Hu moments (tested 4.13.0)
+scikit-image>=0.22   # Haralick / GLCM texture features (tested 0.26.0)
+scikit-learn>=1.3    # all ML models, cross-validation, metrics (tested 1.8.0)
+scipy>=1.11          # Gaussian fits for the Bayes plot (tested 1.17.1)
+matplotlib>=3.8      # all graphs (tested 3.10.9)
