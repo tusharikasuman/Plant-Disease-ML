@@ -41,10 +41,20 @@ class Prediction:
     explanation: list[dict] = field(default_factory=list)   # most influential features
     group_explanation: dict[str, float] = field(default_factory=dict)   # summed push per feature group
     features: np.ndarray | None = None
+    bayes_p_diseased: float | None = None      # Bayesian LR predictive P(diseased) (Phase 3), if trained
+    bayes_p_diseased_map: float | None = None  # same model without weight uncertainty (plug-in MAP)
 
     @property
     def low_confidence(self) -> bool:
         return self.confidence < config.LOW_CONFIDENCE
+
+    @property
+    def bayes_confidence(self) -> float | None:
+        return None if self.bayes_p_diseased is None else max(self.bayes_p_diseased, 1 - self.bayes_p_diseased)
+
+    @property
+    def refer_to_expert(self) -> bool:
+        return self.bayes_confidence is not None and self.bayes_confidence < config.BAYES_REFER_BELOW
 
 
 class ModelsNotTrainedError(FileNotFoundError):
@@ -68,6 +78,7 @@ def load_models(models_dir: Path = config.MODELS_DIR) -> dict:
         "best": best,
         "logreg": load_bundle(models_dir / config.LOGREG_MODEL_PATH.name),
         "chlorophyll": load_bundle(models_dir / config.CHLOROPHYLL_MODEL_PATH.name),
+        "bayes": load_bundle(models_dir / config.BAYES_MODEL_PATH.name),
     }
 
 
@@ -130,6 +141,12 @@ def predict(image, models: dict | None = None) -> Prediction:
     if models.get("chlorophyll") is not None:
         spad = float(models["chlorophyll"]["pipeline"].predict(x[None])[0])
 
+    p_bayes = p_bayes_map = None
+    if models.get("bayes") is not None:
+        z = models["bayes"]["scaler"].transform(x[None])
+        p_bayes = float(models["bayes"]["model"].predict_proba(z)[0, 1])
+        p_bayes_map = float(models["bayes"]["model"].predict_proba_map(z)[0, 1])
+
     top_features, groups = explain(models.get("logreg"), x, label)
     return Prediction(
         top3=top3, label=label, confidence=confidence,
@@ -140,7 +157,7 @@ def predict(image, models: dict | None = None) -> Prediction:
         spad=spad, leaf_found=seg.leaf_found,
         model_name=best["model_name"],
         explanation=top_features, group_explanation=groups,
-        features=x,
+        features=x, bayes_p_diseased=p_bayes, bayes_p_diseased_map=p_bayes_map,
     )
 
 
@@ -156,6 +173,12 @@ def format_prediction(p: Prediction) -> str:
     else:
         lines.append(f"Greenness:   {p.greenness_index:.3f} GLI (uncalibrated greenness index, -1..1 - "
                      f"NOT a chlorophyll / SPAD value)")
+    if p.bayes_p_diseased is not None:
+        lines.append(f"Bayesian LR: P(diseased) = {100 * p.bayes_p_diseased:.1f}% "
+                     f"(without weight uncertainty: {100 * p.bayes_p_diseased_map:.1f}%)")
+        if p.refer_to_expert:
+            lines.append(f"NOTE: Bayesian confidence {100 * p.bayes_confidence:.0f}% < "
+                         f"{100 * config.BAYES_REFER_BELOW:.0f}% - refer this leaf to an expert")
     if p.low_confidence:
         lines.append(f"WARNING: low confidence ({100 * p.confidence:.0f}% < {100 * config.LOW_CONFIDENCE:.0f}%)")
     if not p.leaf_found:

@@ -1,5 +1,5 @@
 """
-src/evaluate.py - metrics and report tables (graphs are added in Phase 5).
+src/evaluate.py - metrics, report tables and the shared graph style (graphs are added in Phase 5).
 """
 from __future__ import annotations
 
@@ -10,6 +10,42 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score
 
 import config
+
+# ----------------------------------------------------------------------------- graph style
+# Colour-blind safe palette (checked with a CVD validator: every pair below passes in light mode).
+# Colour follows the entity: healthy is always aqua, diseased always orange, and so on.
+COLORS = {
+    "blue": "#2a78d6", "orange": "#eb6834", "aqua": "#1baf7a",
+    "healthy": "#1baf7a", "diseased": "#eb6834",
+    "plain": "#2a78d6", "bayes": "#eb6834",           # plain (MAP) logistic regression vs Bayesian
+    "ink": "#1f2a22", "muted": "#6b7266", "grid": "#e6e3da",
+}
+
+
+def apply_style() -> None:
+    """White background, recessive axes and grid, readable labels."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({
+        "figure.facecolor": "white", "axes.facecolor": "white", "savefig.facecolor": "white",
+        "font.size": 10, "axes.titlesize": 11, "axes.titlelocation": "left", "axes.labelcolor": COLORS["ink"],
+        "axes.edgecolor": "#bdb6a4", "axes.spines.top": False, "axes.spines.right": False,
+        "xtick.color": COLORS["muted"], "ytick.color": COLORS["muted"], "text.color": COLORS["ink"],
+        "axes.grid": True, "grid.color": COLORS["grid"], "grid.linewidth": 0.6, "axes.axisbelow": True,
+        "legend.frameon": False, "lines.linewidth": 2,
+    })
+
+
+def save_fig(fig, name: str, reports_dir: Path = config.REPORTS_DIR) -> Path:
+    """Save reports/<name>.png at 160 dpi and close the figure."""
+    import matplotlib.pyplot as plt
+    reports_dir = Path(reports_dir)
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    path = reports_dir / f"{name}.png"
+    fig.savefig(path, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    return path
 
 
 def classification_metrics(y_true, y_pred) -> dict[str, float]:

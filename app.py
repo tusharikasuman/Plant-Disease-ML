@@ -129,6 +129,22 @@ def page_diagnose(models):
     st.info("ℹ️ The model was trained on **lab photos** (PlantVillage: one leaf, plain background). "
             "Field photos with several leaves, soil or strong shadows may be less accurate.")
 
+    if pred.bayes_p_diseased is not None:
+        st.subheader("Bayesian second opinion")
+        b1, b2, b3 = st.columns(3)
+        b1.metric("P(diseased), Bayesian", f"{100 * pred.bayes_p_diseased:.1f}%",
+                  help="Bayesian logistic regression: averages over all plausible weight vectors (Laplace "
+                       "posterior), so it is less sure when the leaf looks unlike the training leaves.")
+        b2.metric("P(diseased), plain LR", f"{100 * pred.bayes_p_diseased_map:.1f}%",
+                  help="Same model using only the single best weight vector (MAP), ignoring weight uncertainty.")
+        b3.metric("Bayesian confidence", f"{100 * pred.bayes_confidence:.0f}%")
+        if pred.refer_to_expert:
+            st.warning(f"🔎 The Bayesian model is unsure (confidence < {100 * config.BAYES_REFER_BELOW:.0f}%). "
+                       "Refer this leaf to an expert.")
+        bayes_diseased = pred.bayes_p_diseased >= 0.5
+        if bayes_diseased == pred.is_healthy:
+            st.caption("Note: the Bayesian healthy/diseased model disagrees with the main disease model above.")
+
     # ---- explanation
     st.subheader("3 · Why this prediction?")
     if not pred.group_explanation:
@@ -214,12 +230,75 @@ def page_results(models):
         with st.expander("Per-class precision / recall / F1 of the best model"):
             st.code(rep.read_text(encoding="utf-8"))
 
-    graphs = sorted(config.REPORTS_DIR.glob("*.png"))
+    graphs = sorted(g for g in config.REPORTS_DIR.glob("*.png") if not g.name.startswith("bayes_"))
     if graphs:
         st.subheader("Graphs")
         cols = st.columns(2)
         for i, g in enumerate(graphs):
             cols[i % 2].image(str(g), caption=g.stem.replace("_", " "), width="stretch")
+
+
+# ----------------------------------------------------------------------------- page: bayesian
+BAYES_GRAPHS = [
+    ("bayes_2_uncertainty_2d", "What the Bayesian model 'thinks', on 2 features",
+     "Left: the predictive probability of *diseased*; the black line is the decision boundary (P = 0.5). "
+     "Right: the uncertainty s = √(xᵀS_N x) of the score. It is smallest where the training leaves are and grows "
+     "as we move away from them: the model knows what it has not seen."),
+    ("bayes_7_unseen_disease", "A disease the model never saw",
+     "One disease is removed from training, then its leaves are predicted. On the harder hidden diseases the "
+     "Bayesian predictive has lower log-loss and is less over-confident on the leaves it gets wrong."),
+    ("bayes_4_confidence_vs_error", "Confidence tells us when to ask an expert",
+     "Wrong predictions come with low confidence. Sending the least confident leaves to an expert raises the "
+     "accuracy on the rest."),
+    ("bayes_3_small_data", "Familiar leaves and small training sets",
+     "On leaves like the training leaves, the plain MAP probability is already well calibrated, and the extra "
+     "Bayesian caution costs a little log-loss. This is an honest negative result."),
+    ("bayes_5_weights", "Weights with 95% credible intervals",
+     "The Laplace posterior gives every weight an interval. Wide intervals crossing 0 mean the data cannot pin "
+     "that weight down - usually because the feature is strongly correlated with others."),
+    ("bayes_1_evidence", "Choosing the prior strength without a validation set",
+     "The Laplace evidence ln p(D | α) picks the prior precision α (= 1/C in sklearn)."),
+    ("bayes_6_reliability", "Reliability diagram",
+     "Points on the diagonal mean '80% sure' is right 80% of the time."),
+]
+
+
+def page_bayes():
+    st.title("🎲 Bayesian logistic regression")
+    st.markdown("""
+Healthy vs diseased, written **from scratch in NumPy** (Unit 2: probabilistic discriminative models):
+
+* **Prior** - Gaussian on the weights, w ~ N(0, α⁻¹I).
+* **MAP** - the most probable weights, found with **Newton's method** (iteratively reweighted least squares).
+* **Laplace approximation** - the Hessian at the MAP is the inverse posterior covariance S_N.
+* **Predictive** - averages the sigmoid over all plausible weights, using the **probit approximation**
+  σ(κ(s²)·μ), κ = (1 + πs²/8)^-½. This pulls uncertain predictions towards 50 %.
+""")
+    res = report("bayes_results.csv")
+    if res is None:
+        st.error("No Bayesian results yet. Run  `python -m src.bayes_logreg`  in the terminal.")
+        return
+    weights = report("bayes_weights.csv")
+    if weights is not None:
+        diff = (weights["w_MAP"] - weights["w_sklearn"]).abs().max()
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Accuracy (held-out)", f"{res['Accuracy (%)'].iloc[-1]:.2f}%")
+        c2.metric("Max |w_MAP − w_sklearn|", f"{diff:.1e}", help="Our NumPy MAP equals sklearn with C = 1/α")
+        c3.metric("Features", f"{len(weights)} + bias")
+    st.dataframe(res.round(4), hide_index=True, width="stretch")
+
+    for name, title, text in BAYES_GRAPHS:
+        path = config.REPORTS_DIR / f"{name}.png"
+        if path.exists():
+            st.subheader(title)
+            st.write(text)
+            st.image(str(path), width="stretch")
+            if name == "bayes_7_unseen_disease" and report("bayes_unseen_disease.csv") is not None:
+                with st.expander("Table"):
+                    st.dataframe(report("bayes_unseen_disease.csv").round(3), hide_index=True, width="stretch")
+            if name == "bayes_3_small_data" and report("bayes_small_data.csv") is not None:
+                with st.expander("Table"):
+                    st.dataframe(report("bayes_small_data.csv").round(3), hide_index=True, width="stretch")
 
 
 # ----------------------------------------------------------------------------- page: how it works
@@ -266,7 +345,8 @@ def main():
     with st.sidebar:
         st.markdown("## 🌿 Leaf Doctor")
         st.caption("Plant disease detection & chlorophyll estimation with classical machine learning")
-        page = st.radio("Page", ["Diagnose a leaf", "Model results", "How it works"], label_visibility="collapsed")
+        page = st.radio("Page", ["Diagnose a leaf", "Model results", "Bayesian LR", "How it works"],
+                        label_visibility="collapsed")
         st.divider()
         if models is not None:
             b = models["best"]
@@ -281,6 +361,8 @@ def main():
         page_diagnose(models)
     elif page == "Model results":
         page_results(models)
+    elif page == "Bayesian LR":
+        page_bayes()
     else:
         page_how()
 

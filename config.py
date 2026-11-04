@@ -111,7 +111,10 @@ CV_PER_CLASS = 500              # leaves per class used for grid search + CV (ke
 SVM_MAX_PER_CLASS = 1000        # kernel SVM training cost grows ~n^2: cap the final fit per class
 BEST_MODEL_PATH = MODELS_DIR / "best_model.joblib"
 LOGREG_MODEL_PATH = MODELS_DIR / "logistic_regression.joblib"   # interpretable model for explanations
-CHLOROPHYLL_MODEL_PATH = MODELS_DIR / "chlorophyll_model.joblib"  # only exists after real SPAD calibration
+BAYES_MODEL_PATH = MODELS_DIR / "bayes_logreg.joblib"            # healthy vs diseased, with uncertainty
+BAYES_REFER_BELOW = 0.90       # Bayesian healthy/diseased confidence below this -> "refer to an expert"
+BAYES_ALPHAS =[0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100]   # prior precisions tried (evidence)
+CHLOROPHYLL_MODEL_PATH =MODELS_DIR / "chlorophyll_model.joblib"  # only exists after real SPAD calibration
 LOW_CONFIDENCE = 0.6            # below this the app warns that the prediction is uncertain
 
 # ----------------------------------------------------------------------------- parallelism

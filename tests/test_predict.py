@@ -22,6 +22,13 @@ def tiny_models(tmp_path_factory, ):
     out = tmp_path_factory.mktemp("models")
     C.run(data, model_keys=["lr", "rf"], cv_per_class=None, ablation=False, n_jobs=1,
           reports_dir=out, models_dir=out)
+
+    import joblib
+    from sklearn.preprocessing import StandardScaler
+    from src.bayes_logreg import BayesianLogisticRegression, binary_target
+    scaler = StandardScaler().fit(X)
+    blr = BayesianLogisticRegression(alpha=1.0).fit(scaler.transform(X), binary_target(y, names))
+    joblib.dump({"scaler": scaler, "model": blr}, out / config.BAYES_MODEL_PATH.name)
     return P.load_models(out), paths, names
 
 
@@ -36,6 +43,8 @@ def test_predict_sample_images(tiny_models):
         assert 0 <= p.lesion_percent <= 100 and -1 <= p.greenness_index <= 1
         assert p.spad is None                                # no chlorophyll model -> never a SPAD value
         assert p.explanation and set(p.group_explanation) == set(P.GROUP_LABELS.values())
+        assert (p.bayes_p_diseased >= 0.5) == (not p.is_healthy)     # Bayesian second opinion agrees
+        assert abs(p.bayes_p_diseased - 0.5) <= abs(p.bayes_p_diseased_map - 0.5) + 1e-12
 
 
 def test_group_explanation_sums_single_contributions(tiny_models):
@@ -80,6 +89,7 @@ def test_streamlit_app_runs_every_page(tiny_models, monkeypatch):
     at.selectbox[0].select(at.selectbox[0].options[1]).run()      # first sample leaf
     assert not at.exception
     assert {m.label for m in at.metric} >= {"Diagnosis", "Confidence", "Lesion area", "Greenness index (GLI)"}
-    for page in ["Model results", "How it works"]:
+    assert "P(diseased), Bayesian" in {m.label for m in at.metric}
+    for page in ["Model results", "Bayesian LR", "How it works"]:
         at.radio[0].set_value(page).run()
         assert not at.exception
