@@ -11,5 +11,5 @@ matplotlib>=3.8      # all graphs
 tqdm>=4.66           # progress bars during feature extraction
 joblib>=1.3          # saving / loading trained models
 pandas>=2.0          # tables (CSV / Markdown reports, SPAD readings)
-streamlit>=1.30      # web app (Phase 6)
+streamlit>=1.50      # web app
 pytest>=7.4          # tests

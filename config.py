@@ -111,6 +111,8 @@ CV_PER_CLASS = 500              # leaves per class used for grid search + CV (ke
 SVM_MAX_PER_CLASS = 1000        # kernel SVM training cost grows ~n^2: cap the final fit per class
 BEST_MODEL_PATH = MODELS_DIR / "best_model.joblib"
 LOGREG_MODEL_PATH = MODELS_DIR / "logistic_regression.joblib"   # interpretable model for explanations
+CHLOROPHYLL_MODEL_PATH = MODELS_DIR / "chlorophyll_model.joblib"  # only exists after real SPAD calibration
+LOW_CONFIDENCE = 0.6            # below this the app warns that the prediction is uncertain
 
 # ----------------------------------------------------------------------------- parallelism
 # leave one core free; cap at 8 workers so 8 GB laptops are fine
