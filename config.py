@@ -105,6 +105,13 @@ GLCM_DISTANCES = (1, 2)
 GLCM_ANGLES = (0.0, np.pi / 4, np.pi / 2, 3 * np.pi / 4)
 FEATURE_VERSION = "v2"          # bump this when features.py changes, so old caches are rebuilt
 
+# ----------------------------------------------------------------------------- classification (Phase 2)
+CV_FOLDS = 5                    # stratified k-fold cross-validation
+CV_PER_CLASS = 500              # leaves per class used for grid search + CV (keeps 38 classes fast)
+SVM_MAX_PER_CLASS = 1000        # kernel SVM training cost grows ~n^2: cap the final fit per class
+BEST_MODEL_PATH = MODELS_DIR / "best_model.joblib"
+LOGREG_MODEL_PATH = MODELS_DIR / "logistic_regression.joblib"   # interpretable model for explanations
+
 # ----------------------------------------------------------------------------- parallelism
 # leave one core free; cap at 8 workers so 8 GB laptops are fine
 N_JOBS = max(1, min(8, (os.cpu_count() or 2) - 1))
