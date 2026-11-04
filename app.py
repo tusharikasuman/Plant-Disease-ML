@@ -122,6 +122,12 @@ def page_diagnose(models):
     if pred.low_confidence:
         st.warning(f"⚠️ Low confidence ({100 * pred.confidence:.0f}% < {100 * config.LOW_CONFIDENCE:.0f}%). "
                    "The model is unsure - check the top-3 list and consider a clearer photo.")
+    if pred.spad is not None:
+        c = models["chlorophyll"]
+        st.caption(f"SPAD model: {c['model_name']}, calibrated on {c['n_leaves']} real leaves "
+                   f"({', '.join(c['crops'])}), SPAD range {c['spad_range'][0]:.1f}–{c['spad_range'][1]:.1f}.")
+        if pred.spad_outside_range:
+            st.warning("This SPAD estimate is outside the range of the calibration readings, so it is unreliable.")
     if pred.spad is None:
         st.caption("The greenness index is an **uncalibrated** colour measure, not a chlorophyll value. "
                    "A SPAD estimate appears only after the chlorophyll model is calibrated with real SPAD "
@@ -230,7 +236,8 @@ def page_results(models):
         with st.expander("Per-class precision / recall / F1 of the best model"):
             st.code(rep.read_text(encoding="utf-8"))
 
-    graphs = sorted(g for g in config.REPORTS_DIR.glob("*.png") if not g.name.startswith("bayes_"))
+    graphs = sorted(g for g in config.REPORTS_DIR.glob("*.png")
+                    if not g.name.startswith(("bayes_", "chlorophyll_")))      # those have their own pages
     if graphs:
         st.subheader("Graphs")
         cols = st.columns(2)
@@ -301,6 +308,57 @@ Healthy vs diseased, written **from scratch in NumPy** (Unit 2: probabilistic di
                     st.dataframe(report("bayes_small_data.csv").round(3), hide_index=True, width="stretch")
 
 
+# ----------------------------------------------------------------------------- page: chlorophyll
+def page_chlorophyll(models):
+    st.title("🧪 Chlorophyll (SPAD)")
+    st.markdown("""
+Following **Paper 2** (Anderson et al., 2026), chlorophyll is estimated with a linear model **b = A X**
+from leaf colour features X to the reading b of a SPAD chlorophyll meter. Models compared: least squares
+(OLS), **Ridge** (λ by cross-validation), Bayesian Ridge, polynomial regression (degree 2) and Random Forest.
+""")
+    calibrated = models is not None and models.get("chlorophyll") is not None
+    if calibrated:
+        c = models["chlorophyll"]
+        st.success(f"Calibrated: **{c['model_name']}** on {c['n_leaves']} real leaves ({', '.join(c['crops'])}), "
+                   f"{c['cv']} cross-validation.")
+        res = report("chlorophyll_results.csv")
+        if res is not None:
+            st.dataframe(res.round(3), hide_index=True, width="stretch")
+        for name, title in [("chlorophyll_2_pred_vs_actual", "Predicted vs measured SPAD"),
+                            ("chlorophyll_3_coefficient_stability", "OLS vs Ridge: coefficient stability")]:
+            path = config.REPORTS_DIR / f"{name}.png"
+            if path.exists():
+                st.subheader(title)
+                st.image(str(path), width="stretch")
+    else:
+        st.warning("**Not calibrated yet.** There are no real SPAD meter readings, so the app shows only an "
+                   "*uncalibrated greenness index* (GLI) - it is **not** a chlorophyll value. No SPAD data is "
+                   "ever made up.")
+        st.markdown("""
+**How to calibrate**
+1. Photograph 30–50 leaves of one crop (same light and background), covering pale to dark green.
+2. Measure each leaf 3–5 times with a SPAD meter and write the readings in `spad_readings.csv`.
+3. Run `python -m src.chlorophyll` and restart the app.
+""")
+        if config.SPAD_CSV.exists():
+            st.download_button("Download the empty spad_readings.csv template", config.SPAD_CSV.read_bytes(),
+                               file_name="spad_readings.csv", mime="text/csv")
+        guide = config.PROJECT_ROOT / "docs" / "spad_collection.md"
+        if guide.exists():
+            with st.expander("Full guide: collecting SPAD readings"):
+                st.markdown(guide.read_text(encoding="utf-8"))
+
+    st.subheader("Why Ridge? The colour features are strongly collinear")
+    st.write("Measured on the real leaves of the disease dataset (no SPAD data needed). A variance inflation "
+             "factor (VIF) above 10 means a feature is almost a combination of the others, so least-squares "
+             "coefficients swing wildly from sample to sample. Ridge regression's L2 penalty stabilises them.")
+    path = config.REPORTS_DIR / "chlorophyll_1_collinearity.png"
+    if path.exists():
+        st.image(str(path), width="stretch")
+    else:
+        st.info("Run `python -m src.chlorophyll` to compute the correlation matrix and VIF.")
+
+
 # ----------------------------------------------------------------------------- page: how it works
 def page_how():
     st.title("🧪 How it works")
@@ -345,7 +403,7 @@ def main():
     with st.sidebar:
         st.markdown("## 🌿 Leaf Doctor")
         st.caption("Plant disease detection & chlorophyll estimation with classical machine learning")
-        page = st.radio("Page", ["Diagnose a leaf", "Model results", "Bayesian LR", "How it works"],
+        page = st.radio("Page", ["Diagnose a leaf", "Model results", "Bayesian LR", "Chlorophyll", "How it works"],
                         label_visibility="collapsed")
         st.divider()
         if models is not None:
@@ -363,6 +421,8 @@ def main():
         page_results(models)
     elif page == "Bayesian LR":
         page_bayes()
+    elif page == "Chlorophyll":
+        page_chlorophyll(models)
     else:
         page_how()
 

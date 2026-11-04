@@ -43,6 +43,7 @@ class Prediction:
     features: np.ndarray | None = None
     bayes_p_diseased: float | None = None      # Bayesian LR predictive P(diseased) (Phase 3), if trained
     bayes_p_diseased_map: float | None = None  # same model without weight uncertainty (plug-in MAP)
+    spad_outside_range: bool = False           # calibrated SPAD outside the range of the real readings
 
     @property
     def low_confidence(self) -> bool:
@@ -137,9 +138,11 @@ def predict(image, models: dict | None = None) -> Prediction:
     healthy = [i for i, n in enumerate(names) if config.is_healthy(n)]
     healthy_p = float(proba[healthy].sum()) if healthy else None
 
-    spad = None
+    spad, spad_outside = None, False
     if models.get("chlorophyll") is not None:
         spad = float(models["chlorophyll"]["pipeline"].predict(x[None])[0])
+        lo, hi = models["chlorophyll"].get("spad_range", (-np.inf, np.inf))
+        spad_outside = not (lo <= spad <= hi)
 
     p_bayes = p_bayes_map = None
     if models.get("bayes") is not None:
@@ -157,7 +160,7 @@ def predict(image, models: dict | None = None) -> Prediction:
         spad=spad, leaf_found=seg.leaf_found,
         model_name=best["model_name"],
         explanation=top_features, group_explanation=groups,
-        features=x, bayes_p_diseased=p_bayes, bayes_p_diseased_map=p_bayes_map,
+        features=x, bayes_p_diseased=p_bayes, bayes_p_diseased_map=p_bayes_map, spad_outside_range=spad_outside,
     )
 
 
@@ -170,6 +173,8 @@ def format_prediction(p: Prediction) -> str:
     lines += ["", f"Status:      {status}{extra}", f"Lesion area: {p.lesion_percent:.1f}% of the leaf"]
     if p.spad is not None:
         lines.append(f"Chlorophyll: {p.spad:.1f} SPAD (calibrated model)")
+        if p.spad_outside_range:
+            lines.append("WARNING: this SPAD value is outside the range of the calibration readings - unreliable")
     else:
         lines.append(f"Greenness:   {p.greenness_index:.3f} GLI (uncalibrated greenness index, -1..1 - "
                      f"NOT a chlorophyll / SPAD value)")

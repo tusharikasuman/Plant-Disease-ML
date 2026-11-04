@@ -113,8 +113,20 @@ BEST_MODEL_PATH = MODELS_DIR / "best_model.joblib"
 LOGREG_MODEL_PATH = MODELS_DIR / "logistic_regression.joblib"   # interpretable model for explanations
 BAYES_MODEL_PATH = MODELS_DIR / "bayes_logreg.joblib"            # healthy vs diseased, with uncertainty
 BAYES_REFER_BELOW = 0.90       # Bayesian healthy/diseased confidence below this -> "refer to an expert"
-BAYES_ALPHAS =[0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100]   # prior precisions tried (evidence)
-CHLOROPHYLL_MODEL_PATH =MODELS_DIR / "chlorophyll_model.joblib"  # only exists after real SPAD calibration
+BAYES_ALPHAS = [0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100]   # prior precisions tried (evidence)
+CHLOROPHYLL_MODEL_PATH = MODELS_DIR / "chlorophyll_model.joblib"  # only exists after real SPAD calibration
+
+# ----------------------------------------------------------------------------- chlorophyll (Phase 4)
+# Paper 2 fits b = A X from leaf colour X to the SPAD meter value b
+CHLORO_FEATURE_SETS = {
+    "rgb": ["R mean", "G mean", "B mean"],                                          # Paper 2's linear model
+    "colour": ["R mean", "G mean", "B mean", "GLI", "G/R ratio", "ExG (normalised)"],
+}
+CHLORO_DEFAULT_FEATURES = "rgb"
+MIN_SPAD_LEAVES = 10            # refuse to train on fewer real readings than this
+LOOCV_MAX_LEAVES = 60           # leave-one-out CV up to this many leaves, 10-fold above
+SPAD_RANGE = (0.0, 100.0)       # plausible SPAD meter values; anything outside is a typing error
+
 LOW_CONFIDENCE = 0.6            # below this the app warns that the prediction is uncertain
 
 # ----------------------------------------------------------------------------- parallelism
