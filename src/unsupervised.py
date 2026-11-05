@@ -115,7 +115,6 @@ def run(data: dict, reports_dir: Path = config.REPORTS_DIR, n_jobs: int = config
     best_k = list(BIC_K_RANGE)[int(np.argmin(bic))]
     trace = em_trace(Z, K)
     clusters = {"k-means": km.labels_, "GMM (EM)": gm.predict(Z)}
-    responsibilities = gm.predict_proba(Z)
 
     # k-means elbow (inertia) and silhouette for several K
     from sklearn.metrics import silhouette_score
@@ -145,7 +144,7 @@ def run(data: dict, reports_dir: Path = config.REPORTS_DIR, n_jobs: int = config
     save_table(elbow.round(4), "unsup_kmeans_elbow", reports_dir, "k-means: inertia and silhouette for each K")
 
     make_graphs(pca, Xs, y, data["class_names"], names, cum, need, pca_table, bic, best_k, trace, clusters,
-                responsibilities, elbow, K, reports_dir)
+                elbow, K, reports_dir)
     return {"need": need, "pca": pca_table, "clustering": clus_table, "bic_best_k": best_k, "em_trace": trace}
 
 
@@ -168,7 +167,7 @@ def _contingency(ax, y, c, names, title, cmap, C):
 
 
 def make_graphs(pca, Xs, y, class_names, names, cum, need, pca_table, bic, best_k, trace, clusters,
-                responsibilities, elbow, K, reports_dir):
+                elbow, K, reports_dir):
     import matplotlib.pyplot as plt
     from matplotlib.colors import LinearSegmentedColormap
 
@@ -227,21 +226,6 @@ def make_graphs(pca, Xs, y, class_names, names, cum, need, pca_table, bic, best_
     ax.set_title("Dimensionality reduction: fewer components -> less information -> lower accuracy")
     save_fig(fig, "pca", "2_accuracy_vs_components", reports_dir)
 
-    # ===== PCA 3: loadings of PC1 and PC2
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
-    for ax, pc in zip(axes, (0, 1)):
-        load = pca.components_[pc]
-        top = np.argsort(np.abs(load))[-10:]
-        ax.barh(range(10), load[top], color=[C["orange"] if v > 0 else C["blue"] for v in load[top]])
-        ax.set_yticks(range(10), [F.FEATURE_NAMES[j] for j in top], fontsize=8.5)
-        ax.axvline(0, color=C["ink"], lw=0.8); ax.grid(axis="y", visible=False)
-        ax.set_xlabel("loading (weight of the feature in this component)")
-        ax.set_title(f"PC{pc + 1} ({100 * pca.explained_variance_ratio_[pc]:.1f}% of variance): top 10 features",
-                     fontsize=10)
-    fig.suptitle("What do the principal components measure?", x=0.01, ha="left", fontsize=12)
-    fig.tight_layout()
-    save_fig(fig, "pca", "3_loadings_pc1_pc2", reports_dir)
-
     # ===== k-means 1: elbow + silhouette
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.8))
     a1.plot(elbow["K"], elbow["Inertia"], color=C["blue"], marker="o", ms=6)
@@ -259,7 +243,7 @@ def make_graphs(pca, Xs, y, class_names, names, cum, need, pca_table, bic, best_
 
     # ===== k-means 2 and GMM 3: clusters vs true classes
     for topic, name, method in [("kmeans", "2_clusters_vs_classes", "k-means"),
-                                ("gmm", "3_clusters_vs_classes", "GMM (EM)")]:
+                                ("gmm", "2_clusters_vs_classes", "GMM (EM)")]:
         fig, ax = plt.subplots(figsize=(7.4, 0.5 * len(names) + 2.2))
         im = _contingency(ax, y, clusters[method], names, method, seq, C)
         fig.colorbar(im, ax=ax, shrink=0.8, label="% of the true class in each cluster")
@@ -283,20 +267,6 @@ def make_graphs(pca, Xs, y, class_names, names, cum, need, pca_table, bic, best_
     a2.set_title(f"EM never decreases the likelihood ({K} components)")
     save_fig(fig, "gmm", "1_bic_and_em", reports_dir)
 
-    # ===== GMM 2: soft assignments (how sure is each leaf's cluster membership?)
-    top = responsibilities.max(axis=1)
-    fig, ax = plt.subplots(figsize=(8, 3.8))
-    bins = np.linspace(1 / K, 1, 30)
-    is_h = healthy[y]
-    ax.hist(top[~is_h], bins=bins, color=C["diseased"], alpha=0.75, label="diseased leaves")
-    ax.hist(top[is_h], bins=bins, color=C["healthy"], alpha=0.75, label="healthy leaves")
-    ax.set_yscale("log")
-    ax.set_xlabel("largest responsibility  max_k p(cluster k | leaf)   (1 = certain)")
-    ax.set_ylabel("number of leaves (log scale)")
-    ax.legend(fontsize=9, loc="upper left")
-    ax.set_title(f"GMM soft clustering: {100 * (top > 0.9).mean():.0f}% of leaves are > 90% sure of their cluster "
-                 f"(k-means is always 100%)", fontsize=10)
-    save_fig(fig, "gmm", "2_soft_assignments", reports_dir)
 
 
 def main(argv: list[str] | None = None) -> int:

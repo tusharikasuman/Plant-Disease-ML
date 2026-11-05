@@ -240,26 +240,19 @@ def page_results(models):
 
 # ----------------------------------------------------------------------------- page: bayesian
 BAYES_GRAPHS = [
-    ("2_uncertainty_2d", "What the Bayesian model 'thinks', on 2 features",
+    ("1_uncertainty_2d", "What the Bayesian model 'thinks', on 2 features",
      "Left: the predictive probability of *diseased*; the black line is the decision boundary (P = 0.5). "
      "Right: the uncertainty s = √(xᵀS_N x) of the score. It is smallest where the training leaves are and grows "
      "as we move away from them: the model knows what it has not seen."),
-    ("7_unseen_disease", "A disease the model never saw",
+    ("3_unseen_disease", "A disease the model never saw",
      "One disease is removed from training, then its leaves are predicted. On the harder hidden diseases the "
      "Bayesian predictive has lower log-loss and is less over-confident on the leaves it gets wrong."),
-    ("4_confidence_vs_error", "Confidence tells us when to ask an expert",
+    ("2_confidence_vs_error", "Confidence tells us when to ask an expert",
      "Wrong predictions come with low confidence. Sending the least confident leaves to an expert raises the "
      "accuracy on the rest."),
-    ("3_small_data", "Familiar leaves and small training sets",
-     "On leaves like the training leaves, the plain MAP probability is already well calibrated, and the extra "
-     "Bayesian caution costs a little log-loss. This is an honest negative result."),
-    ("5_weights", "Weights with 95% credible intervals",
+    ("4_weights", "Weights with 95% credible intervals",
      "The Laplace posterior gives every weight an interval. Wide intervals crossing 0 mean the data cannot pin "
      "that weight down - usually because the feature is strongly correlated with others."),
-    ("1_evidence", "Choosing the prior strength without a validation set",
-     "The Laplace evidence ln p(D | α) picks the prior precision α (= 1/C in sklearn)."),
-    ("6_reliability", "Reliability diagram",
-     "Points on the diagonal mean '80% sure' is right 80% of the time."),
 ]
 
 
@@ -293,12 +286,9 @@ Healthy vs diseased, written **from scratch in NumPy** (Unit 2: probabilistic di
             st.subheader(title)
             st.write(text)
             st.image(str(path), width="stretch")
-            if name == "7_unseen_disease" and report("bayes_unseen_disease.csv") is not None:
+            if name == "3_unseen_disease" and report("bayes_unseen_disease.csv") is not None:
                 with st.expander("Table"):
                     st.dataframe(report("bayes_unseen_disease.csv").round(3), hide_index=True, width="stretch")
-            if name == "3_small_data" and report("bayes_small_data.csv") is not None:
-                with st.expander("Table"):
-                    st.dataframe(report("bayes_small_data.csv").round(3), hide_index=True, width="stretch")
 
 
 # ----------------------------------------------------------------------------- page: chlorophyll

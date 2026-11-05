@@ -368,17 +368,6 @@ def make_graphs(data, X, y, Xv, yv, blr, sk, alpha, evidence, p_sk, p_bayes, con
     apply_style()
     C = COLORS
 
-    # -- 1. evidence vs alpha
-    fig, ax = plt.subplots(figsize=(6.4, 3.6))
-    ax.plot(config.BAYES_ALPHAS, evidence, color=C["bayes"], marker="o", ms=6)
-    ax.axvline(alpha, color=C["muted"], ls=":", lw=1)
-    ax.annotate(f"best alpha = {alpha:g}", (alpha, max(evidence)), xytext=(8, -14), textcoords="offset points",
-                fontsize=9, color=C["ink"])
-    ax.set_xscale("log"); ax.set_xlabel("prior precision alpha   (larger = stronger pull of weights towards 0)")
-    ax.set_ylabel("log evidence  ln p(D | alpha)")
-    ax.set_title("Choosing the prior strength by the Laplace evidence")
-    save_fig(fig, "bayes", "1_evidence", reports_dir)
-
     # -- 2. 2-feature picture: probability and uncertainty, trained on few leaves so uncertainty is visible
     fx, fy = F.FEATURE_NAMES.index("Lesion fraction"), F.FEATURE_NAMES.index("GLCM contrast")
     rng = np.random.default_rng(config.SEED)
@@ -413,24 +402,7 @@ def make_graphs(data, X, y, Xv, yv, blr, sk, alpha, evidence, p_sk, p_bayes, con
                  transform=axes[1].transAxes, ha="right", fontsize=8, color=C["ink"])
     fig.suptitle(f"Bayesian logistic regression on 2 features, {len(y2)} training leaves",
                  x=0.01, ha="left", fontsize=12)
-    save_fig(fig, "bayes", "2_uncertainty_2d", reports_dir)
-
-    # -- 3. small training sets: log-loss of MAP vs Bayesian predictive
-    if len(small):
-        g = small.groupby("Train size")
-        fig, axes = plt.subplots(1, 2, figsize=(11, 3.8))
-        for ax, metric, ylab in [(axes[0], "log-loss", "log-loss on valid set (lower = better)"),
-                                 (axes[1], "ECE", "calibration error ECE (lower = better)")]:
-            for key, col, lab, mk in [("MAP", C["plain"], "MAP plug-in (plain LR)", "o"),
-                                      ("Bayes", C["bayes"], "Bayesian predictive", "s")]:
-                mean, sd = g[f"{key} {metric}"].mean(), g[f"{key} {metric}"].std()
-                ax.plot(mean.index, mean.values, color=col, marker=mk, ms=6, label=lab)
-                ax.fill_between(mean.index, mean - sd, mean + sd, color=col, alpha=0.12, lw=0)
-            ax.set_xscale("log"); ax.set_xlabel("number of training leaves"); ax.set_ylabel(ylab)
-        axes[0].legend(fontsize=9)
-        axes[0].set_title("Familiar leaves: the plug-in MAP is already well calibrated")
-        axes[1].set_title("Calibration: is 90% confidence right 90% of the time?")
-        save_fig(fig, "bayes", "3_small_data", reports_dir)
+    save_fig(fig, "bayes", "1_uncertainty_2d", reports_dir)
 
     # -- 4. confidence vs mistakes
     fig, axes = plt.subplots(1, 2, figsize=(11, 3.8))
@@ -446,7 +418,7 @@ def make_graphs(data, X, y, Xv, yv, blr, sk, alpha, evidence, p_sk, p_bayes, con
     axes[1].set_xlabel("% of leaves kept (most confident first; the rest go to an expert)")
     axes[1].set_ylabel("accuracy on kept leaves (%)"); axes[1].set_xlim(0, 100)
     axes[1].set_title("Refer unsure leaves -> higher accuracy on the rest")
-    save_fig(fig, "bayes", "4_confidence_vs_error", reports_dir)
+    save_fig(fig, "bayes", "2_confidence_vs_error", reports_dir)
 
     # -- 4b. unseen disease
     if len(unseen):
@@ -464,7 +436,7 @@ def make_graphs(data, X, y, Xv, yv, blr, sk, alpha, evidence, p_sk, p_bayes, con
                 axes[1].text(0.51, i, "no missed leaves", va="center", fontsize=8, color=C["muted"])
         axes[0].legend(fontsize=8, loc="lower right")
         axes[0].set_title("A disease the model never saw")
-        save_fig(fig, "bayes", "7_unseen_disease", reports_dir)
+        save_fig(fig, "bayes", "3_unseen_disease", reports_dir)
 
     # -- 5. weights with 95% credible intervals
     lo, hi = blr.credible_intervals()
@@ -479,22 +451,8 @@ def make_graphs(data, X, y, Xv, yv, blr, sk, alpha, evidence, p_sk, p_bayes, con
     ax.set_yticks(ypos, [F.FEATURE_NAMES[j] for j in top]); ax.grid(axis="y", visible=False)
     ax.set_xlabel("weight on standardised feature   (+ pushes towards diseased, - towards healthy)")
     ax.set_title("15 largest weights with 95% credible intervals")
-    save_fig(fig, "bayes", "5_weights", reports_dir)
+    save_fig(fig, "bayes", "4_weights", reports_dir)
 
-    # -- 6. reliability diagram
-    fig, ax = plt.subplots(figsize=(5.4, 5))
-    ax.plot([0, 1], [0, 1], color=C["muted"], ls=":", lw=1, label="perfect calibration")
-    edges = np.linspace(0, 1, 11)
-    for p, col, lab, mk in [(p_sk, C["plain"], "plain logistic regression", "o"),
-                            (p_bayes, C["bayes"], "Bayesian predictive", "s")]:
-        b = np.clip(np.digitize(p, edges) - 1, 0, 9)
-        xs = [p[b == k].mean() for k in range(10) if (b == k).sum() >= 5]
-        ys = [yv[b == k].mean() for k in range(10) if (b == k).sum() >= 5]
-        ax.plot(xs, ys, color=col, marker=mk, ms=6, label=lab)
-    ax.set_xlabel("predicted P(diseased)"); ax.set_ylabel("observed fraction diseased")
-    ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.set_aspect("equal"); ax.legend(fontsize=8, loc="upper left")
-    ax.set_title("Reliability diagram (valid set)")
-    save_fig(fig, "bayes", "6_reliability", reports_dir)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -27,14 +27,13 @@ def data():
 @pytest.mark.parametrize("topic,name,make", [
     ("features", "1_segmentation_examples", lambda d, r: G.segmentation_examples(r)),
     ("features", "2_key_features_by_class", lambda d, r: G.feature_boxplots(d, r)),
-    ("features", "3_feature_correlation_55", lambda d, r: G.feature_correlation(d, r)),
     ("tree", "1_depth_vs_overfitting", lambda d, r: G.tree_depth_curve(d, r, 1)),
     ("tree", "2_tree_depth3", lambda d, r: G.tree_diagram(d, r)),
     ("rf", "1_accuracy_vs_number_of_trees", lambda d, r: G.rf_trees_curve(d, r, 1, {})),
     ("rf", "2_feature_importance", lambda d, r: G.rf_importance(d, r, 1, {})),
     ("boosting", "1_accuracy_per_round", lambda d, r: G.boosting_rounds(d, r)),
     ("knn", "1_accuracy_vs_k", lambda d, r: G.knn_k_curve(d, r, 1)),
-    ("cv", "3_svm_grid_search", lambda d, r: G.svm_grid_heatmap(d, r, 1)),
+    ("cv", "2_svm_grid_search", lambda d, r: G.svm_grid_heatmap(d, r, 1)),
     ("ablation", "2_leave_one_group_out", lambda d, r: G.leave_one_group_out(d, r, 1, {})),
 ])
 def test_graph_is_saved_in_its_topic_folder(data, tmp_path, topic, name, make):
@@ -45,7 +44,6 @@ def test_graph_is_saved_in_its_topic_folder(data, tmp_path, topic, name, make):
 
 def test_graphs_needing_results_are_skipped_without_them(tmp_path):
     assert G.model_comparison(tmp_path) is None
-    assert G.cv_fold_scores(tmp_path) is None
     assert G.cumulative_ablation(tmp_path) is None
 
 

@@ -285,18 +285,18 @@ Every graph is a PNG in `reports/figures/`, one numbered folder per topic. In th
 
 | Topic | Folder | Graphs |
 |---|---|---|
-| Feature representation | `01_feature_representation` | segmentation examples, 6 key features per class, 55 x 55 correlation |
-| PCA | `02_pca` | scatter + scree plot, accuracy vs number of components, PC1/PC2 loadings |
+| Feature representation | `01_feature_representation` | segmentation examples, 6 key features per class |
+| PCA | `02_pca` | scatter + scree plot, accuracy vs number of components |
 | k-means | `03_kmeans` | elbow + silhouette, clusters vs diseases |
-| GMM + EM | `04_gmm_em` | BIC + EM log-likelihood, soft assignments, clusters vs diseases |
+| GMM + EM | `04_gmm_em` | BIC + EM log-likelihood, clusters vs diseases |
 | Decision trees | `05_decision_trees` | depth vs over-fitting, the tree drawn (depth 3) |
 | Bagging / Random Forest | `06_bagging_random_forest` | accuracy vs number of trees, feature importance |
 | Boosting | `07_boosting` | accuracy per boosting round (3 learning rates), bagging vs boosting |
 | KNN | `08_knn` | accuracy vs k, with and without scaling |
-| CV & model selection | `09_cv_model_selection` | model comparison, per-fold CV scores, SVM grid search, learning curve |
+| CV & model selection | `09_cv_model_selection` | model comparison, SVM grid search, learning curve |
 | Evaluation metrics | `10_evaluation_metrics` | confusion matrix, precision / recall / F1 per class, ROC curves |
 | Ablation | `11_ablation` | cumulative ablation, leave-one-group-out |
-| Bayesian LR | `12_bayesian_logistic_regression` | 7 graphs |
+| Bayesian LR | `12_bayesian_logistic_regression` | uncertainty map, confidence vs errors, unseen disease, weights |
 | Chlorophyll | `13_chlorophyll` | correlation + VIF |
 
 ---

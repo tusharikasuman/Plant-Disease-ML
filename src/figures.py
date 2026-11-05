@@ -2,12 +2,12 @@
 src/figures.py - every graph of the supervised part of the project, one function per graph.
 
 Each graph is saved to reports/figures/<topic folder>/ (folders are listed in config.FIG):
-  01_feature_representation  segmentation examples, key features per class, 55 x 55 correlation
+  01_feature_representation  segmentation examples, key features per class
   05_decision_trees          depth vs over-fitting, the tree itself (depth 3)
   06_bagging_random_forest   accuracy vs number of trees, feature importance
   07_boosting                accuracy after each boosting round (3 learning rates), bagging vs boosting
   08_knn                     accuracy vs k, with and without feature scaling
-  09_cv_model_selection      model comparison, per-fold CV scores, SVM grid search heatmap, learning curve
+  09_cv_model_selection      model comparison, SVM grid search heatmap, learning curve
   10_evaluation_metrics      confusion matrix, precision / recall / F1 per class, ROC curves
   11_ablation                cumulative ablation, leave-one-group-out ablation
 (PCA, k-means and GMM graphs are made by src/unsupervised.py, Bayesian ones by src/bayes_logreg.py,
@@ -119,27 +119,6 @@ def feature_boxplots(data, reports_dir):
                  "in each box)", x=0.01, ha="left", fontsize=11)
     fig.tight_layout()
     return save_fig(fig, "features", "2_key_features_by_class", reports_dir)
-
-
-def feature_correlation(data, reports_dir):
-    """55 x 55 correlation matrix, with the 5 feature groups marked."""
-    plt = _plt()
-    from matplotlib.colors import LinearSegmentedColormap
-    corr = np.nan_to_num(np.corrcoef(data["X_train"].T))
-    div = LinearSegmentedColormap.from_list("div", [C["blue"], "#f4f3ef", C["orange"]])
-    fig, ax = plt.subplots(figsize=(10.5, 9.2))
-    im = ax.imshow(corr, cmap=div, vmin=-1, vmax=1)
-    n = len(F.FEATURE_NAMES)
-    ax.set_xticks(range(n), F.FEATURE_NAMES, rotation=90, fontsize=5.5)
-    ax.set_yticks(range(n), F.FEATURE_NAMES, fontsize=5.5); ax.grid(False)
-    for g, cols in F.FEATURE_GROUPS.items():
-        lo, hi = cols[0] - 0.5, cols[-1] + 0.5
-        ax.add_patch(plt.Rectangle((lo, lo), hi - lo, hi - lo, fill=False, ec=C["ink"], lw=1.2))
-        ax.text(hi + 0.3, lo + 0.2, g, fontsize=8, va="top", color=C["ink"])
-    fig.colorbar(im, ax=ax, shrink=0.75, label="Pearson correlation r")
-    strong = int((np.abs(corr[np.triu_indices(n, 1)]) > 0.8).sum())
-    ax.set_title(f"Correlation of all 55 features ({strong} pairs with |r| > 0.8) - boxes = feature groups")
-    return save_fig(fig, "features", "3_feature_correlation_55", reports_dir)
 
 
 # ============================================================================ 05 decision trees
@@ -319,26 +298,6 @@ def model_comparison(reports_dir):
     return save_fig(fig, "cv", "1_model_comparison", reports_dir)
 
 
-def cv_fold_scores(reports_dir):
-    plt = _plt()
-    path = config.tables_dir(reports_dir) / "classification_scores.json"
-    if not path.exists():
-        return None
-    models = json.loads(path.read_text(encoding="utf-8"))["models"]
-    items = sorted(models.values(), key=lambda m: np.mean(m["cv_fold_scores"]))
-    fig, ax = plt.subplots(figsize=(8.5, 0.5 * len(items) + 1.4))
-    for i, m in enumerate(items):
-        s = 100 * np.array(m["cv_fold_scores"])
-        ax.plot([s.min(), s.max()], [i, i], color=C["grid"], lw=6, solid_capstyle="round", zorder=1)
-        ax.scatter(s, np.full(len(s), i), s=36, color=C["blue"], edgecolors="white", lw=1, zorder=2)
-        ax.scatter([s.mean()], [i], s=90, marker="|", color=C["ink"], lw=2, zorder=3)
-        ax.text(s.max() + 0.4, i, f"{s.mean():.1f} ± {s.std():.1f}", va="center", fontsize=8)
-    ax.set_yticks(range(len(items)), [m["name"] for m in items]); ax.grid(axis="y", visible=False)
-    ax.set_xlabel("accuracy on each of the 5 CV folds (%)   |  = mean")
-    ax.set_title("Cross-validation: every model is scored on 5 different held-out folds")
-    return save_fig(fig, "cv", "2_cv_fold_scores", reports_dir)
-
-
 def svm_grid_heatmap(data, reports_dir, n_jobs):
     from sklearn.model_selection import GridSearchCV
     from sklearn.svm import SVC
@@ -361,7 +320,7 @@ def svm_grid_heatmap(data, reports_dir, n_jobs):
     ax.set_ylabel("C (larger = less regularisation)"); ax.grid(False)
     fig.colorbar(im, ax=ax, label="5-fold CV accuracy (%)")
     ax.set_title(f"Grid search for the RBF SVM: best C = {Cs[bi]}, gamma = {gammas[bj]} ({grid.max():.1f}%)")
-    return save_fig(fig, "cv", "3_svm_grid_search", reports_dir)
+    return save_fig(fig, "cv", "2_svm_grid_search", reports_dir)
 
 
 def learning_curve_best(data, reports_dir, n_jobs):
@@ -385,7 +344,7 @@ def learning_curve_best(data, reports_dir, n_jobs):
         ax.fill_between(sizes, m - s, m + s, color=col, alpha=0.12, lw=0)
     ax.set_xlabel("number of training leaves"); ax.set_ylabel("accuracy (%)"); ax.legend(fontsize=9, loc="lower right")
     ax.set_title(f"Learning curve of the best model ({bundle['model_name']}): more leaves -> higher CV accuracy")
-    return save_fig(fig, "cv", "4_learning_curve_best_model", reports_dir)
+    return save_fig(fig, "cv", "3_learning_curve_best_model", reports_dir)
 
 
 # ============================================================================ 10 evaluation metrics
@@ -543,12 +502,10 @@ def make_all(data: dict | None, reports_dir: Path = config.REPORTS_DIR, n_jobs: 
     params = _tuned_params(reports_dir)
     jobs = [("segmentation examples", lambda: segmentation_examples(reports_dir)),
             ("model comparison", lambda: model_comparison(reports_dir)),
-            ("CV fold scores", lambda: cv_fold_scores(reports_dir)),
             ("bagging vs boosting", lambda: ensembles_compared(reports_dir)),
             ("cumulative ablation", lambda: cumulative_ablation(reports_dir))]
     if data is not None:
         jobs += [("key features by class", lambda: feature_boxplots(data, reports_dir)),
-                 ("55 x 55 correlation", lambda: feature_correlation(data, reports_dir)),
                  ("tree depth curve", lambda: tree_depth_curve(data, reports_dir, n_jobs)),
                  ("tree diagram", lambda: tree_diagram(data, reports_dir)),
                  ("random forest vs trees", lambda: rf_trees_curve(data, reports_dir, n_jobs, params)),
