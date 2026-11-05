@@ -50,7 +50,7 @@ def test_full_run_writes_reports_and_models(tmp_path):
     assert (results["Best"] == "*").sum() == 1
     for name in ["classification_results.csv", "classification_results.md", "ablation.csv", "ablation.md",
                  "syllabus_mapping.md", "classification_report_best.txt", "classification_scores.json"]:
-        assert (tmp_path / "reports" / name).exists(), name
+        assert (tmp_path / "reports" / "tables" / name).exists(), name
 
     for model_file in ["best_model.joblib", "logistic_regression.joblib"]:
         bundle = joblib.load(tmp_path / "models" / model_file)

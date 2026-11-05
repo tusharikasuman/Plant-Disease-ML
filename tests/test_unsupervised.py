@@ -2,6 +2,8 @@
 import numpy as np
 import pytest
 
+import config
+
 from src import features as F
 from src import unsupervised as U
 
@@ -33,6 +35,10 @@ def test_run_on_separable_data(tmp_path):
     clus = out["clustering"].set_index("Method")
     assert clus.loc["k-means", "ARI"] > 0.9 and clus.loc["GMM (EM)", "ARI"] > 0.9
     assert clus.loc["Random assignment (reference)", "ARI"] < 0.1
-    for name in ["unsup_1_pca.png", "unsup_2_gmm_bic_em.png", "unsup_3_clusters_vs_classes.png",
-                 "unsup_pca.csv", "unsup_clustering.csv", "unsup_bic.csv"]:
-        assert (tmp_path / name).exists(), name
+    for topic, name in [("pca", "1_pca_scatter_scree.png"), ("pca", "2_accuracy_vs_components.png"),
+                        ("pca", "3_loadings_pc1_pc2.png"), ("kmeans", "1_elbow_silhouette.png"),
+                        ("kmeans", "2_clusters_vs_classes.png"), ("gmm", "1_bic_and_em.png"),
+                        ("gmm", "2_soft_assignments.png"), ("gmm", "3_clusters_vs_classes.png")]:
+        assert (config.figure_dir(topic, tmp_path) / name).exists(), name
+    for name in ["unsup_pca.csv", "unsup_clustering.csv", "unsup_bic.csv", "unsup_kmeans_elbow.csv"]:
+        assert (config.tables_dir(tmp_path) / name).exists(), name

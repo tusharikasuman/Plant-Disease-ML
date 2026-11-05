@@ -14,9 +14,35 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_ROOT / "data"          # put the unzipped Kaggle dataset here (or anywhere: it is auto-detected)
 CACHE_DIR = PROJECT_ROOT / "cache"        # features.npz lives here
 MODELS_DIR = PROJECT_ROOT / "models"      # trained models (joblib)
-REPORTS_DIR = PROJECT_ROOT / "reports"    # graphs, CSV and Markdown tables
+REPORTS_DIR = PROJECT_ROOT / "reports"    # everything generated: reports/figures/<topic>/*.png, reports/tables/
 SAMPLES_DIR = PROJECT_ROOT / "samples"    # a few leaf photos for tests and the demo
-SPAD_CSV = PROJECT_ROOT / "spad_readings.csv"   # real SPAD meter readings (Phase 4)
+SPAD_DIR = PROJECT_ROOT / "spad"          # real SPAD meter readings + the leaf photos they belong to
+SPAD_CSV = SPAD_DIR / "spad_readings.csv"
+
+# one folder per topic under reports/figures/ (numbered in presentation order)
+FIG = {
+    "features": "01_feature_representation",
+    "pca": "02_pca",
+    "kmeans": "03_kmeans",
+    "gmm": "04_gmm_em",
+    "tree": "05_decision_trees",
+    "rf": "06_bagging_random_forest",
+    "boosting": "07_boosting",
+    "knn": "08_knn",
+    "cv": "09_cv_model_selection",
+    "metrics": "10_evaluation_metrics",
+    "ablation": "11_ablation",
+    "bayes": "12_bayesian_logistic_regression",
+    "chlorophyll": "13_chlorophyll",
+}
+
+
+def figure_dir(topic: str, reports_dir: Path | None = None) -> Path:
+    return Path(reports_dir or REPORTS_DIR) / "figures" / FIG[topic]
+
+
+def tables_dir(reports_dir: Path | None = None) -> Path:
+    return Path(reports_dir or REPORTS_DIR) / "tables"
 
 # ----------------------------------------------------------------------------- reproducibility
 SEED = 42

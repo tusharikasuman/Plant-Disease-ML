@@ -37,12 +37,12 @@ def apply_style() -> None:
     })
 
 
-def save_fig(fig, name: str, reports_dir: Path = config.REPORTS_DIR) -> Path:
-    """Save reports/<name>.png at 160 dpi and close the figure."""
+def save_fig(fig, topic: str, name: str, reports_dir: Path = config.REPORTS_DIR) -> Path:
+    """Save reports/figures/<topic folder>/<name>.png at 160 dpi and close the figure."""
     import matplotlib.pyplot as plt
-    reports_dir = Path(reports_dir)
-    reports_dir.mkdir(parents=True, exist_ok=True)
-    path = reports_dir / f"{name}.png"
+    folder = config.figure_dir(topic, reports_dir)
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / f"{name}.png"
     fig.savefig(path, dpi=160, bbox_inches="tight")
     plt.close(fig)
     return path
@@ -85,94 +85,47 @@ def text_table(df: pd.DataFrame) -> str:
 
 
 def save_table(df: pd.DataFrame, name: str, reports_dir: Path = config.REPORTS_DIR, title: str = "") -> None:
-    """Write reports/<name>.csv and reports/<name>.md."""
-    reports_dir = Path(reports_dir)
-    reports_dir.mkdir(parents=True, exist_ok=True)
-    df.to_csv(reports_dir / f"{name}.csv", index=False)
+    """Write reports/tables/<name>.csv and reports/tables/<name>.md."""
+    folder = config.tables_dir(reports_dir)
+    folder.mkdir(parents=True, exist_ok=True)
+    df.to_csv(folder / f"{name}.csv", index=False)
     md = (f"## {title}\n\n" if title else "") + markdown_table(df) + "\n"
-    (reports_dir / f"{name}.md").write_text(md, encoding="utf-8")
+    (folder / f"{name}.md").write_text(md, encoding="utf-8")
 
 
-# ----------------------------------------------------------------------------- graphs (Phase 5)
-def plot_segmentation(image_paths, reports_dir: Path = config.REPORTS_DIR) -> Path:
-    """One row per leaf: original | leaf mask | segmented leaf with lesion pixels highlighted."""
-    import matplotlib.pyplot as plt
-    from src import features as F
-    apply_style()
-    rows = len(image_paths)
-    fig, axes = plt.subplots(rows, 3, figsize=(9, 3.1 * rows), squeeze=False)
-    for r, path in enumerate(image_paths):
-        v = F.segmented_views(path)
-        x, _ = F.extract_features(path)
-        name = Path(path).stem.replace("tomato_", "").replace("_", " ")
-        for c, (img, title) in enumerate([(v["image"], f"{name}: original"),
-                                          (v["mask"], "leaf mask (white = leaf)"),
-                                          (v["lesions"], f"lesions in orange: {100 * x[F.LESION_INDEX]:.1f}% of leaf")]):
-            ax = axes[r, c]
-            ax.imshow(img, cmap="gray" if img.ndim == 2 else None)
-            ax.set_title(title, fontsize=9.5); ax.axis("off")
-    fig.suptitle("Segmentation: HSV threshold -> closing -> largest component -> fill holes",
-                 x=0.01, ha="left", fontsize=11)
-    fig.tight_layout()
-    return save_fig(fig, "segmentation_examples", reports_dir)
+# ----------------------------------------------------------------------------- command line
+def main(argv: list[str] | None = None) -> int:
+    """Regenerate the graphs.
 
+    python -m src.evaluate          supervised graphs (features, trees, forests, boosting, KNN, CV, metrics,
+                                    ablation) from the feature cache and the saved results of src.classify
+    python -m src.evaluate --all    also re-runs src.unsupervised, src.bayes_logreg and src.chlorophyll
+    """
+    import argparse
+    ap = argparse.ArgumentParser(description="Regenerate every graph into reports/figures/<topic>/.")
+    ap.add_argument("--limit", type=int, default=None, help="use the --limit N feature cache")
+    ap.add_argument("--all", action="store_true", help="also PCA/clustering, Bayesian LR and chlorophyll graphs")
+    args = ap.parse_args(argv)
 
-def plot_model_comparison(results: pd.DataFrame, reports_dir: Path = config.REPORTS_DIR) -> Path:
-    """Horizontal bars: 5-fold CV accuracy (+- std) and held-out balanced accuracy for every model."""
-    import matplotlib.pyplot as plt
-    apply_style()
-    order = results.sort_values("CV accuracy (%)").reset_index(drop=True)
-    y = np.arange(len(order))
-    fig, ax = plt.subplots(figsize=(8.5, 0.55 * len(order) + 1.4))
-    b1 = ax.barh(y + 0.2, order["CV accuracy (%)"], 0.38, xerr=order["CV std"], color=COLORS["blue"],
-                 error_kw={"ecolor": COLORS["muted"], "capsize": 2, "lw": 1}, label="5-fold CV accuracy (± std)")
-    b2 = ax.barh(y - 0.2, order["Valid balanced acc (%)"], 0.38, color=COLORS["orange"],
-                 label="held-out balanced accuracy")
-    ax.bar_label(b1, fmt="%.1f", padding=10, fontsize=8, color=COLORS["ink"])
-    ax.bar_label(b2, fmt="%.1f", padding=3, fontsize=8, color=COLORS["ink"])
-    ax.set_yticks(y, [f"{m}  ·  {u}" for m, u in zip(order["Model"], order["Syllabus"])])
-    ax.set_xlim(max(0, order[["CV accuracy (%)", "Valid balanced acc (%)"]].min().min() - 10), 103)
-    ax.set_xlabel("accuracy (%)"); ax.grid(axis="y", visible=False)
-    ax.legend(loc="lower right", fontsize=8.5)
-    ax.set_title("Disease classification: 8 classical models, same 55 features")
-    return save_fig(fig, "model_comparison", reports_dir)
+    from src import dataset, figures
+    try:
+        data = dataset.load_features(args.limit)
+    except FileNotFoundError as e:
+        print(f"{e}\nOnly graphs that do not need the feature cache will be made.")
+        data = None
+    if not (config.tables_dir() / "classification_results.csv").exists():
+        print("No classification results yet - run  python -m src.classify  first for the model graphs.")
+    print(f"Saving graphs to {config.REPORTS_DIR / 'figures'}")
+    figures.make_all(data)
 
-
-def plot_ablation(abl: pd.DataFrame, reports_dir: Path = config.REPORTS_DIR) -> Path:
-    """Grouped bars: CV accuracy as feature groups are added."""
-    import matplotlib.pyplot as plt
-    apply_style()
-    cols = [c for c in abl.columns if c.endswith("CV acc (%)")]
-    x = np.arange(len(abl))
-    fig, ax = plt.subplots(figsize=(8.5, 3.8))
-    width = 0.8 / max(len(cols), 1)
-    for i, (col, color) in enumerate(zip(cols, [COLORS["blue"], COLORS["orange"]])):
-        bars = ax.bar(x + (i - (len(cols) - 1) / 2) * width, abl[col], width * 0.95, color=color,
-                      label=col.replace(" CV acc (%)", ""))
-        ax.bar_label(bars, fmt="%.1f", fontsize=8, padding=2, color=COLORS["ink"])
-    ax.set_xticks(x, [f"{s}\n({n} features)" for s, n in zip(abl["Feature set"], abl["# features"])], fontsize=8.5)
-    ax.set_ylim(max(0, abl[cols].min().min() - 12), 100); ax.set_ylabel("5-fold CV accuracy (%)")
-    ax.grid(axis="x", visible=False); ax.legend(fontsize=8.5, loc="upper left")
-    ax.set_title("Feature ablation: what each feature group adds")
-    return save_fig(fig, "ablation", reports_dir)
-
-
-def main() -> int:
-    """Regenerate every graph that can be made from the saved results."""
-    made = []
-    samples = sorted(config.SAMPLES_DIR.glob("*.jpg"))
-    if samples:
-        made.append(plot_segmentation(samples))
-    res = config.REPORTS_DIR / "classification_results.csv"
-    if res.exists():
-        made.append(plot_model_comparison(pd.read_csv(res)))
-    abl = config.REPORTS_DIR / "ablation.csv"
-    if abl.exists():
-        made.append(plot_ablation(pd.read_csv(abl)))
-    if not res.exists():
-        print("No classification results yet - run  python -m src.classify  first.")
-    for p in made:
-        print(f"Saved {p}")
+    if args.all and data is not None:
+        from src import bayes_logreg, chlorophyll, unsupervised
+        print("\nPCA, k-means, GMM:")
+        unsupervised.run(data)
+        print("\nBayesian logistic regression:")
+        bayes_logreg.run(data)
+        print("\nChlorophyll:")
+        chlorophyll.run(dataset_features=data)
     return 0
 
 

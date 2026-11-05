@@ -50,7 +50,7 @@ def read_csv(path: str, mtime: float) -> pd.DataFrame:      # mtime -> reload wh
 
 
 def report(name: str) -> pd.DataFrame | None:
-    path = config.REPORTS_DIR / name
+    path = config.tables_dir() / name
     return read_csv(str(path), path.stat().st_mtime) if path.exists() else None
 
 
@@ -231,41 +231,34 @@ def page_results(models):
         ax.legend(frameon=False, fontsize=8)
         st.pyplot(fig); plt.close(fig)
 
-    rep = config.REPORTS_DIR / "classification_report_best.txt"
+    rep = config.tables_dir() / "classification_report_best.txt"
     if rep.exists():
         with st.expander("Per-class precision / recall / F1 of the best model"):
             st.code(rep.read_text(encoding="utf-8"))
-
-    graphs = sorted(g for g in config.REPORTS_DIR.glob("*.png")
-                    if not g.name.startswith(("bayes_", "chlorophyll_")))      # those have their own pages
-    if graphs:
-        st.subheader("Graphs")
-        cols = st.columns(2)
-        for i, g in enumerate(graphs):
-            cols[i % 2].image(str(g), caption=g.stem.replace("_", " "), width="stretch")
+    st.caption("Every graph, by topic, is on the **All graphs** page.")
 
 
 # ----------------------------------------------------------------------------- page: bayesian
 BAYES_GRAPHS = [
-    ("bayes_2_uncertainty_2d", "What the Bayesian model 'thinks', on 2 features",
+    ("2_uncertainty_2d", "What the Bayesian model 'thinks', on 2 features",
      "Left: the predictive probability of *diseased*; the black line is the decision boundary (P = 0.5). "
      "Right: the uncertainty s = √(xᵀS_N x) of the score. It is smallest where the training leaves are and grows "
      "as we move away from them: the model knows what it has not seen."),
-    ("bayes_7_unseen_disease", "A disease the model never saw",
+    ("7_unseen_disease", "A disease the model never saw",
      "One disease is removed from training, then its leaves are predicted. On the harder hidden diseases the "
      "Bayesian predictive has lower log-loss and is less over-confident on the leaves it gets wrong."),
-    ("bayes_4_confidence_vs_error", "Confidence tells us when to ask an expert",
+    ("4_confidence_vs_error", "Confidence tells us when to ask an expert",
      "Wrong predictions come with low confidence. Sending the least confident leaves to an expert raises the "
      "accuracy on the rest."),
-    ("bayes_3_small_data", "Familiar leaves and small training sets",
+    ("3_small_data", "Familiar leaves and small training sets",
      "On leaves like the training leaves, the plain MAP probability is already well calibrated, and the extra "
      "Bayesian caution costs a little log-loss. This is an honest negative result."),
-    ("bayes_5_weights", "Weights with 95% credible intervals",
+    ("5_weights", "Weights with 95% credible intervals",
      "The Laplace posterior gives every weight an interval. Wide intervals crossing 0 mean the data cannot pin "
      "that weight down - usually because the feature is strongly correlated with others."),
-    ("bayes_1_evidence", "Choosing the prior strength without a validation set",
+    ("1_evidence", "Choosing the prior strength without a validation set",
      "The Laplace evidence ln p(D | α) picks the prior precision α (= 1/C in sklearn)."),
-    ("bayes_6_reliability", "Reliability diagram",
+    ("6_reliability", "Reliability diagram",
      "Points on the diagonal mean '80% sure' is right 80% of the time."),
 ]
 
@@ -295,15 +288,15 @@ Healthy vs diseased, written **from scratch in NumPy** (Unit 2: probabilistic di
     st.dataframe(res.round(4), hide_index=True, width="stretch")
 
     for name, title, text in BAYES_GRAPHS:
-        path = config.REPORTS_DIR / f"{name}.png"
+        path = config.figure_dir("bayes") / f"{name}.png"
         if path.exists():
             st.subheader(title)
             st.write(text)
             st.image(str(path), width="stretch")
-            if name == "bayes_7_unseen_disease" and report("bayes_unseen_disease.csv") is not None:
+            if name == "7_unseen_disease" and report("bayes_unseen_disease.csv") is not None:
                 with st.expander("Table"):
                     st.dataframe(report("bayes_unseen_disease.csv").round(3), hide_index=True, width="stretch")
-            if name == "bayes_3_small_data" and report("bayes_small_data.csv") is not None:
+            if name == "3_small_data" and report("bayes_small_data.csv") is not None:
                 with st.expander("Table"):
                     st.dataframe(report("bayes_small_data.csv").round(3), hide_index=True, width="stretch")
 
@@ -324,9 +317,9 @@ from leaf colour features X to the reading b of a SPAD chlorophyll meter. Models
         res = report("chlorophyll_results.csv")
         if res is not None:
             st.dataframe(res.round(3), hide_index=True, width="stretch")
-        for name, title in [("chlorophyll_2_pred_vs_actual", "Predicted vs measured SPAD"),
-                            ("chlorophyll_3_coefficient_stability", "OLS vs Ridge: coefficient stability")]:
-            path = config.REPORTS_DIR / f"{name}.png"
+        for name, title in [("2_pred_vs_actual", "Predicted vs measured SPAD"),
+                            ("3_coefficient_stability", "OLS vs Ridge: coefficient stability")]:
+            path = config.figure_dir("chlorophyll") / f"{name}.png"
             if path.exists():
                 st.subheader(title)
                 st.image(str(path), width="stretch")
@@ -337,7 +330,7 @@ from leaf colour features X to the reading b of a SPAD chlorophyll meter. Models
         st.markdown("""
 **How to calibrate**
 1. Photograph 30–50 leaves of one crop (same light and background), covering pale to dark green.
-2. Measure each leaf 3–5 times with a SPAD meter and write the readings in `spad_readings.csv`.
+2. Measure each leaf 3–5 times with a SPAD meter and write the readings in `spad/spad_readings.csv`.
 3. Run `python -m src.chlorophyll` and restart the app.
 """)
         if config.SPAD_CSV.exists():
@@ -352,11 +345,35 @@ from leaf colour features X to the reading b of a SPAD chlorophyll meter. Models
     st.write("Measured on the real leaves of the disease dataset (no SPAD data needed). A variance inflation "
              "factor (VIF) above 10 means a feature is almost a combination of the others, so least-squares "
              "coefficients swing wildly from sample to sample. Ridge regression's L2 penalty stabilises them.")
-    path = config.REPORTS_DIR / "chlorophyll_1_collinearity.png"
+    path = config.figure_dir("chlorophyll") / "1_collinearity.png"
     if path.exists():
         st.image(str(path), width="stretch")
     else:
         st.info("Run `python -m src.chlorophyll` to compute the correlation matrix and VIF.")
+
+
+# ----------------------------------------------------------------------------- page: all graphs
+TOPIC_TITLES = {
+    "features": "Feature representation", "pca": "PCA", "kmeans": "k-means", "gmm": "GMM + EM",
+    "tree": "Decision trees", "rf": "Bagging / Random Forest", "boosting": "Boosting", "knn": "KNN",
+    "cv": "CV & model selection", "metrics": "Evaluation metrics", "ablation": "Ablation",
+    "bayes": "Bayesian LR", "chlorophyll": "Chlorophyll",
+}
+
+
+def page_graphs():
+    st.title("🖼️ All graphs")
+    st.write("Every graph of the project, one tab per topic. The same PNG files are in "
+             "`reports/figures/<topic>/` for slides. Regenerate them with `python -m src.evaluate`.")
+    topics = [t for t in config.FIG if any(config.figure_dir(t).glob("*.png"))]
+    if not topics:
+        st.error("No graphs yet. Run  `python -m src.evaluate`  in the terminal.")
+        return
+    for tab, topic in zip(st.tabs([TOPIC_TITLES[t] for t in topics]), topics):
+        with tab:
+            for g in sorted(config.figure_dir(topic).glob("*.png")):
+                st.markdown(f"**{g.stem.replace('_', ' ')}**  ·  `reports/figures/{config.FIG[topic]}/{g.name}`")
+                st.image(str(g), width="stretch")
 
 
 # ----------------------------------------------------------------------------- page: how it works
@@ -403,8 +420,8 @@ def main():
     with st.sidebar:
         st.markdown("## 🌿 Leaf Doctor")
         st.caption("Plant disease detection & chlorophyll estimation with classical machine learning")
-        page = st.radio("Page", ["Diagnose a leaf", "Model results", "Bayesian LR", "Chlorophyll", "How it works"],
-                        label_visibility="collapsed")
+        page = st.radio("Page", ["Diagnose a leaf", "Model results", "All graphs", "Bayesian LR", "Chlorophyll",
+                                 "How it works"], label_visibility="collapsed")
         st.divider()
         if models is not None:
             b = models["best"]
@@ -419,6 +436,8 @@ def main():
         page_diagnose(models)
     elif page == "Model results":
         page_results(models)
+    elif page == "All graphs":
+        page_graphs()
     elif page == "Bayesian LR":
         page_bayes()
     elif page == "Chlorophyll":

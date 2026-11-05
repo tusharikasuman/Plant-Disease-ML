@@ -1,6 +1,6 @@
 # Collecting SPAD readings for the chlorophyll model
 
-The chlorophyll model is trained **only from real SPAD meter readings**. Until `spad_readings.csv`
+The chlorophyll model is trained **only from real SPAD meter readings**. Until `spad/spad_readings.csv`
 contains at least 10 real readings (30–50 is much better), the app shows an *uncalibrated greenness
 index* and never a SPAD value. Never type in made-up or estimated values.
 
@@ -25,14 +25,14 @@ index* and never a SPAD value. Never type in made-up or estimated values.
 3. **Record** every reading as its own row with the same `image_path`. The program averages readings of the
    same photo automatically.
 
-Put the photos in a folder next to the CSV, e.g. `spad_photos/`.
+Put the photos in `spad/photos/` (next to the CSV).
 
-## Filling in `spad_readings.csv`
-The file already exists in the project folder with these columns:
+## Filling in `spad/spad_readings.csv`
+The file is `spad/spad_readings.csv` and already has these columns:
 
 | column | required | meaning |
 |---|---|---|
-| `image_path` | yes | path to the photo, relative to the CSV (e.g. `spad_photos/leaf_001.jpg`) or absolute |
+| `image_path` | yes | path to the photo, relative to the CSV (e.g. `photos/leaf_001.jpg`) or absolute |
 | `spad_value` | yes | one SPAD meter reading (number between 0 and 100) |
 | `crop` | recommended | e.g. `tomato` |
 | `leaf_id` | optional | your own label for the leaf |
@@ -43,10 +43,10 @@ Example layout (your own numbers go in `spad_value`):
 
 ```
 image_path,spad_value,crop,leaf_id,date,notes
-spad_photos/leaf_001.jpg,<reading 1>,tomato,L1,2026-11-10,
-spad_photos/leaf_001.jpg,<reading 2>,tomato,L1,2026-11-10,
-spad_photos/leaf_001.jpg,<reading 3>,tomato,L1,2026-11-10,
-spad_photos/leaf_002.jpg,<reading 1>,tomato,L2,2026-11-10,
+photos/leaf_001.jpg,<reading 1>,tomato,L1,2026-11-10,
+photos/leaf_001.jpg,<reading 2>,tomato,L1,2026-11-10,
+photos/leaf_001.jpg,<reading 3>,tomato,L1,2026-11-10,
+photos/leaf_002.jpg,<reading 1>,tomato,L2,2026-11-10,
 ```
 
 ## Training

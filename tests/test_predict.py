@@ -90,6 +90,6 @@ def test_streamlit_app_runs_every_page(tiny_models, monkeypatch):
     assert not at.exception
     assert {m.label for m in at.metric} >= {"Diagnosis", "Confidence", "Lesion area", "Greenness index (GLI)"}
     assert "P(diseased), Bayesian" in {m.label for m in at.metric}
-    for page in ["Model results", "Bayesian LR", "Chlorophyll", "How it works"]:
+    for page in ["Model results", "All graphs", "Bayesian LR", "Chlorophyll", "How it works"]:
         at.radio[0].set_value(page).run()
         assert not at.exception

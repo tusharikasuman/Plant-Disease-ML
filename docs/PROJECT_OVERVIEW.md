@@ -50,7 +50,8 @@
 | ④ Bayesian logistic regression (from scratch) | `src/bayes_logreg.py` |
 | PCA, k-means, Gaussian mixture (EM) | `src/unsupervised.py` |
 | ④ Chlorophyll / SPAD regression | `src/chlorophyll.py` |
-| Metrics, tables, graphs | `src/evaluate.py` |
+| Metrics, tables, graph style | `src/evaluate.py` |
+| All supervised-learning graphs | `src/figures.py` |
 | Predict one photo | `src/predict.py` |
 | ⑤ Web app | `app.py` |
 
@@ -147,6 +148,8 @@ Lesion fraction alone already separates the classes (mean per class):
 
 Colour features matter most (+13 points), and texture adds a further 2 points.
 
+**Leave-one-group-out** (remove one group, keep the rest; RBF SVM, all 55 features = 87.4%): removing the HSV histogram costs the most (−5.2 points), then texture (−2.6), RGB (−1.0) and indices (−0.6). Removing the shape features slightly *helps* (+0.7), so shape adds little for this model.
+
 ### Unsupervised learning (PCA, k-means, Gaussian mixture + EM)
 
 Run on the 9,302 training leaves; the disease labels are used **only afterwards**, to score the clusters.
@@ -188,7 +191,7 @@ Run on the 9,302 training leaves; the disease labels are used **only afterwards*
   GLI 807, ExG 715**. R and G correlate at **r = 0.91**.
 - VIF above 10 means least-squares coefficients are unstable, so **Ridge** regression is needed
   (Unit 1 covariance → Unit 2 ridge).
-- **Not calibrated yet.** The model needs real SPAD meter readings (`spad_readings.csv`,
+- **Not calibrated yet.** The model needs real SPAD meter readings (`spad/spad_readings.csv`,
   see `docs/spad_collection.md`). Until then the app shows only an *uncalibrated greenness index*,
   clearly labelled **not chlorophyll**. We never fake data.
 
@@ -205,7 +208,8 @@ streamlit run app.py
 | Page | What it shows |
 |---|---|
 | **Diagnose a leaf** | Original / mask / lesions, diagnosis, confidence, lesion %, top-3 chart, Bayesian second opinion, "Why this prediction?" |
-| **Model results** | All 9 models compared, ablation chart, per-class precision / recall / F1, PCA and clustering graphs |
+| **Model results** | All 9 models compared, ablation chart, per-class precision / recall / F1 |
+| **All graphs** | Every graph of the project, one tab per topic |
 | **Bayesian LR** | 7 graphs with plain-English explanations |
 | **Chlorophyll** | Calibration status, how to collect SPAD readings, "Why Ridge?" collinearity graph |
 | **How it works** | Pipeline, the 55 features, syllabus mapping, references |
@@ -226,7 +230,7 @@ streamlit run app.py
 | NumPy / SciPy | Bayesian logistic regression written from scratch |
 | matplotlib | All graphs (white background, colour-blind-safe colours) |
 | Streamlit | Web app |
-| pytest | 62 automated tests |
+| pytest | 75 automated tests |
 | Git / GitHub | Version control |
 
 Runs on a normal laptop CPU (8 GB RAM) and in Google Colab.
@@ -274,7 +278,30 @@ not chlorophyll. Once readings are collected, `python -m src.chlorophyll` trains
 
 ---
 
-## 9. How to run everything
+## 9. Where the graphs are (for slides)
+
+Every graph is a PNG in `reports/figures/`, one numbered folder per topic. In the app, the
+**All graphs** page shows them in tabs.
+
+| Topic | Folder | Graphs |
+|---|---|---|
+| Feature representation | `01_feature_representation` | segmentation examples, 6 key features per class, 55 x 55 correlation |
+| PCA | `02_pca` | scatter + scree plot, accuracy vs number of components, PC1/PC2 loadings |
+| k-means | `03_kmeans` | elbow + silhouette, clusters vs diseases |
+| GMM + EM | `04_gmm_em` | BIC + EM log-likelihood, soft assignments, clusters vs diseases |
+| Decision trees | `05_decision_trees` | depth vs over-fitting, the tree drawn (depth 3) |
+| Bagging / Random Forest | `06_bagging_random_forest` | accuracy vs number of trees, feature importance |
+| Boosting | `07_boosting` | accuracy per boosting round (3 learning rates), bagging vs boosting |
+| KNN | `08_knn` | accuracy vs k, with and without scaling |
+| CV & model selection | `09_cv_model_selection` | model comparison, per-fold CV scores, SVM grid search, learning curve |
+| Evaluation metrics | `10_evaluation_metrics` | confusion matrix, precision / recall / F1 per class, ROC curves |
+| Ablation | `11_ablation` | cumulative ablation, leave-one-group-out |
+| Bayesian LR | `12_bayesian_logistic_regression` | 7 graphs |
+| Chlorophyll | `13_chlorophyll` | correlation + VIF |
+
+---
+
+## 10. How to run everything
 
 ```
 pip install -r requirements.txt        # once
@@ -283,7 +310,7 @@ python -m src.classify                 # train and compare the 9 models
 python -m src.bayes_logreg             # Bayesian logistic regression
 python -m src.unsupervised             # PCA, k-means, Gaussian mixture (EM)
 python -m src.chlorophyll              # collinearity analysis; trains only with real SPAD data
-python -m src.evaluate                 # regenerate graphs
+python -m src.evaluate --all           # every graph -> reports/figures/<topic>/
 streamlit run app.py                   # web app
 python -m pytest -q                    # tests
 ```

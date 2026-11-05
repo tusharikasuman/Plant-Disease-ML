@@ -256,7 +256,7 @@ def make_collinearity_graph(corr: pd.DataFrame, vif: pd.DataFrame, n_leaves: int
     a2.set_xscale("log"); a2.set_xlabel("variance inflation factor (log scale)"); a2.grid(axis="y", visible=False)
     a2.set_title("VIF: why least squares is unstable -> Ridge")
     fig.tight_layout()
-    return save_fig(fig, "chlorophyll_1_collinearity", reports_dir)
+    return save_fig(fig, "chlorophyll", "1_collinearity", reports_dir)
 
 
 def make_spad_graphs(y, preds, best, stab, feature_set, reports_dir) -> None:
@@ -280,7 +280,7 @@ def make_spad_graphs(y, preds, best, stab, feature_set, reports_dir) -> None:
     a2.axhline(0, color=COLORS["ink"], lw=0.8)
     a2.set_xlabel("predicted SPAD"); a2.set_ylabel("residual = measured − predicted")
     a2.set_title("Residuals (no pattern = good)")
-    save_fig(fig, "chlorophyll_2_pred_vs_actual", reports_dir)
+    save_fig(fig, "chlorophyll", "2_pred_vs_actual", reports_dir)
 
     names = config.CHLORO_FEATURE_SETS[feature_set]
     fig, ax = plt.subplots(figsize=(7.5, 3.8))
@@ -299,7 +299,7 @@ def make_spad_graphs(y, preds, best, stab, feature_set, reports_dir) -> None:
     ax.set_xticks(pos, names); ax.set_ylabel("coefficient (standardised features)")
     ax.legend(fontsize=8.5); ax.grid(axis="x", visible=False)
     ax.set_title("Coefficient stability over 300 random refits (narrow = stable)")
-    save_fig(fig, "chlorophyll_3_coefficient_stability", reports_dir)
+    save_fig(fig, "chlorophyll", "3_coefficient_stability", reports_dir)
 
 
 # ----------------------------------------------------------------------------- main

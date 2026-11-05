@@ -302,7 +302,7 @@ def run(data: dict, model_keys: list[str] | None = None, cv_per_class: int | Non
     names = [config.pretty_class(c) for c in data["class_names"]]
     report = classification_report(data["y_valid"], best_pipe.predict(data["X_valid"]),
                                    labels=np.arange(len(names)), target_names=names, digits=3, zero_division=0)
-    (reports_dir / "classification_report_best.txt").write_text(
+    (config.tables_dir(reports_dir) / "classification_report_best.txt").write_text(
         f"Best model (by CV accuracy): {best_spec.name}  [{format_params(best_row['_params'])}]\n"
         f"Valid set: {len(data['y_valid'])} leaves ({data.get('valid_source', '')})\n\n{report}", encoding="utf-8")
     print(f"\nBest model by CV accuracy: {best_spec.name}  ->  saved to {models_dir / config.BEST_MODEL_PATH.name}")
@@ -322,7 +322,7 @@ def run(data: dict, model_keys: list[str] | None = None, cv_per_class: int | Non
             save_table(abl, "ablation", reports_dir, "Feature ablation - 5-fold CV accuracy as feature groups are added")
             scores["ablation"] = abl.to_dict("records")
 
-    (reports_dir / "classification_scores.json").write_text(json.dumps(scores, indent=1, default=str),
+    (config.tables_dir(reports_dir) / "classification_scores.json").write_text(json.dumps(scores, indent=1, default=str),
                                                             encoding="utf-8")
     print(f"Tables written to {reports_dir}")
     return results

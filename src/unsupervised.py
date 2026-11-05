@@ -30,6 +30,7 @@ import config
 
 PCA_VARIANCE = 0.95             # clustering runs on the PCs that keep this share of the variance
 BIC_K_RANGE = range(1, 13)
+ELBOW_K_RANGE = range(2, 13)
 PCA_K_LIST = (2, 5, 10, 20, 30)
 
 
@@ -114,6 +115,16 @@ def run(data: dict, reports_dir: Path = config.REPORTS_DIR, n_jobs: int = config
     best_k = list(BIC_K_RANGE)[int(np.argmin(bic))]
     trace = em_trace(Z, K)
     clusters = {"k-means": km.labels_, "GMM (EM)": gm.predict(Z)}
+    responsibilities = gm.predict_proba(Z)
+
+    # k-means elbow (inertia) and silhouette for several K
+    from sklearn.metrics import silhouette_score
+    sil_idx = np.random.default_rng(config.SEED).permutation(len(Z))[:3000]   # silhouette is O(n^2)
+    elbow = []
+    for k in ELBOW_K_RANGE:
+        m = KMeans(n_clusters=k, n_init=5, random_state=config.SEED).fit(Z)
+        elbow.append({"K": k, "Inertia": m.inertia_, "Silhouette": silhouette_score(Z[sil_idx], m.labels_[sil_idx])})
+    elbow = pd.DataFrame(elbow)
     rows = [{"Method": m, "Clusters": K, **cluster_scores(y, c)} for m, c in clusters.items()]
     rows.append({"Method": "Random assignment (reference)", "Clusters": K,
                  **cluster_scores(y, np.random.default_rng(config.SEED).integers(0, K, len(y)))})
@@ -131,36 +142,60 @@ def run(data: dict, reports_dir: Path = config.REPORTS_DIR, n_jobs: int = config
     save_table(pd.DataFrame({"GMM components": list(BIC_K_RANGE), "BIC": np.round(bic, 1)}), "unsup_bic",
                reports_dir, "Gaussian mixture: BIC for each number of components (lower = better)")
 
-    make_graphs(pca, Xs, y, names, cum, need, pca_table, bic, best_k, trace, clusters, K, reports_dir)
+    save_table(elbow.round(4), "unsup_kmeans_elbow", reports_dir, "k-means: inertia and silhouette for each K")
+
+    make_graphs(pca, Xs, y, data["class_names"], names, cum, need, pca_table, bic, best_k, trace, clusters,
+                responsibilities, elbow, K, reports_dir)
     return {"need": need, "pca": pca_table, "clustering": clus_table, "bic_best_k": best_k, "em_trace": trace}
 
 
 # ----------------------------------------------------------------------------- graphs
-def make_graphs(pca, Xs, y, names, cum, need, pca_table, bic, best_k, trace, clusters, K, reports_dir):
-    import matplotlib.pyplot as plt
+def _contingency(ax, y, c, names, title, cmap, C):
+    tab = pd.crosstab(pd.Series(y, name="class"), pd.Series(c, name="cluster"))
+    frac = tab.div(tab.sum(axis=1), axis=0).to_numpy()
+    im = ax.imshow(frac, cmap=cmap, vmin=0, vmax=1, aspect="auto")
+    if frac.shape[0] * frac.shape[1] <= 300:
+        for i in range(frac.shape[0]):
+            for j in range(frac.shape[1]):
+                ax.text(j, i, f"{100 * frac[i, j]:.0f}", ha="center", va="center", fontsize=8,
+                        color="white" if frac[i, j] > 0.55 else C["ink"])
+    ax.set_yticks(range(len(names)), names, fontsize=8.5)
+    ax.set_xticks(range(frac.shape[1]), [f"C{j + 1}" for j in tab.columns], fontsize=8.5)
+    ax.set_xlabel("cluster found without labels"); ax.grid(False)
+    sc = cluster_scores(y, c)
+    ax.set_title(f"{title}: ARI {sc['ARI']:.2f}, NMI {sc['NMI']:.2f}, purity {100 * sc['Purity']:.0f}%", fontsize=10)
+    return im
 
+
+def make_graphs(pca, Xs, y, class_names, names, cum, need, pca_table, bic, best_k, trace, clusters,
+                responsibilities, elbow, K, reports_dir):
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import LinearSegmentedColormap
+
+    from src import features as F
     from src.evaluate import COLORS, apply_style, save_fig
     apply_style()
     C = COLORS
+    seq = LinearSegmentedColormap.from_list("seq", ["#ffffff", "#c9dcf3", C["blue"], "#173f73"])
+    healthy = np.array([config.is_healthy(c) for c in class_names])
     P = pca.transform(Xs)[:, :2]
     v1, v2 = 100 * pca.explained_variance_ratio_[:2]
 
-    # -- 1. PCA: one small panel per class (each class highlighted over all leaves in grey) + scree
-    n_panels = len(names) + 1
+    # ===== PCA 1: one small panel per class (class highlighted over all leaves in grey) + scree
+    show_classes = list(range(len(names)))[:8]
+    n_panels = len(show_classes) + 1
     cols = 3
     rows = int(np.ceil(n_panels / cols))
     fig, axes = plt.subplots(rows, cols, figsize=(11, 3.4 * rows), squeeze=False)
-    rng = np.random.default_rng(config.SEED)
-    show = rng.permutation(len(P))[:4000]
-    for i, name in enumerate(names):
+    show = np.random.default_rng(config.SEED).permutation(len(P))[:4000]
+    for i, k in enumerate(show_classes):
         ax = axes.flat[i]
         ax.scatter(P[show, 0], P[show, 1], s=4, color="#d9d6cc", lw=0)
-        m = show[y[show] == i]
-        col = C["healthy"] if "healthy" in name.lower() else C["diseased"]
-        ax.scatter(P[m, 0], P[m, 1], s=6, color=col, lw=0, alpha=0.8)
-        ax.set_title(name, fontsize=10)
+        m = show[y[show] == k]
+        ax.scatter(P[m, 0], P[m, 1], s=6, color=C["healthy"] if healthy[k] else C["diseased"], lw=0, alpha=0.8)
+        ax.set_title(names[k], fontsize=10)
         ax.set_xlabel(f"PC1 ({v1:.0f}% of variance)", fontsize=8.5); ax.set_ylabel(f"PC2 ({v2:.0f}%)", fontsize=8.5)
-    ax = axes.flat[len(names)]
+    ax = axes.flat[len(show_classes)]
     k = np.arange(1, len(cum) + 1)
     ax.bar(k, 100 * pca.explained_variance_ratio_, color=C["blue"], width=0.8, label="each component")
     ax.plot(k, 100 * cum, color=C["ink"], lw=1.6, label="cumulative")
@@ -174,9 +209,65 @@ def make_graphs(pca, Xs, y, names, cum, need, pca_table, bic, best_k, trace, clu
     fig.suptitle(f"PCA of {len(Xs):,} leaves (each class highlighted over all leaves in grey)",
                  x=0.01, ha="left", fontsize=12)
     fig.tight_layout()
-    save_fig(fig, "unsup_1_pca", reports_dir)
+    save_fig(fig, "pca", "1_pca_scatter_scree", reports_dir)
 
-    # -- 2. GMM: BIC + EM log-likelihood per iteration
+    # ===== PCA 2: accuracy vs number of components
+    fig, ax = plt.subplots(figsize=(8, 4))
+    t = pca_table
+    ax.plot(t["PCA components"], t["LR CV accuracy (%)"], color=C["blue"], marker="o", ms=6,
+            label="logistic regression, 5-fold CV accuracy")
+    ax.fill_between(t["PCA components"], t["LR CV accuracy (%)"] - t["CV std"],
+                    t["LR CV accuracy (%)"] + t["CV std"], color=C["blue"], alpha=0.12, lw=0)
+    ax.plot(t["PCA components"], t["Variance kept (%)"], color=C["muted"], ls="--", lw=1.4, label="variance kept")
+    for _, r in t.iterrows():
+        ax.annotate(f"{r['LR CV accuracy (%)']:.1f}%", (r["PCA components"], r["LR CV accuracy (%)"]),
+                    xytext=(0, -15), textcoords="offset points", ha="center", fontsize=8)
+    ax.set_xlabel("number of principal components kept"); ax.set_ylabel("%"); ax.set_ylim(0, 103)
+    ax.legend(fontsize=9, loc="lower right")
+    ax.set_title("Dimensionality reduction: fewer components -> less information -> lower accuracy")
+    save_fig(fig, "pca", "2_accuracy_vs_components", reports_dir)
+
+    # ===== PCA 3: loadings of PC1 and PC2
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
+    for ax, pc in zip(axes, (0, 1)):
+        load = pca.components_[pc]
+        top = np.argsort(np.abs(load))[-10:]
+        ax.barh(range(10), load[top], color=[C["orange"] if v > 0 else C["blue"] for v in load[top]])
+        ax.set_yticks(range(10), [F.FEATURE_NAMES[j] for j in top], fontsize=8.5)
+        ax.axvline(0, color=C["ink"], lw=0.8); ax.grid(axis="y", visible=False)
+        ax.set_xlabel("loading (weight of the feature in this component)")
+        ax.set_title(f"PC{pc + 1} ({100 * pca.explained_variance_ratio_[pc]:.1f}% of variance): top 10 features",
+                     fontsize=10)
+    fig.suptitle("What do the principal components measure?", x=0.01, ha="left", fontsize=12)
+    fig.tight_layout()
+    save_fig(fig, "pca", "3_loadings_pc1_pc2", reports_dir)
+
+    # ===== k-means 1: elbow + silhouette
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.8))
+    a1.plot(elbow["K"], elbow["Inertia"], color=C["blue"], marker="o", ms=6)
+    a1.set_xlabel("number of clusters K"); a1.set_ylabel("inertia (within-cluster sum of squares)")
+    a1.set_title("Elbow method: inertia always falls - look for the bend"); a1.set_xticks(elbow["K"])
+    a2.plot(elbow["K"], elbow["Silhouette"], color=C["orange"], marker="s", ms=6)
+    bk = int(elbow.loc[elbow["Silhouette"].idxmax(), "K"])
+    a2.annotate(f"best silhouette: K = {bk}", (bk, elbow["Silhouette"].max()), xytext=(10, -14),
+                textcoords="offset points", fontsize=9)
+    a2.axvline(K, color=C["muted"], ls=":", lw=1)
+    a2.text(K, elbow["Silhouette"].min(), f" {K} = number of classes", fontsize=8, color=C["muted"])
+    a2.set_xlabel("number of clusters K"); a2.set_ylabel("silhouette score (higher = better separated)")
+    a2.set_title("Silhouette: how well separated are the clusters?"); a2.set_xticks(elbow["K"])
+    save_fig(fig, "kmeans", "1_elbow_silhouette", reports_dir)
+
+    # ===== k-means 2 and GMM 3: clusters vs true classes
+    for topic, name, method in [("kmeans", "2_clusters_vs_classes", "k-means"),
+                                ("gmm", "3_clusters_vs_classes", "GMM (EM)")]:
+        fig, ax = plt.subplots(figsize=(7.4, 0.5 * len(names) + 2.2))
+        im = _contingency(ax, y, clusters[method], names, method, seq, C)
+        fig.colorbar(im, ax=ax, shrink=0.8, label="% of the true class in each cluster")
+        fig.suptitle("Do the clusters match the diseases? (row = true class)", x=0.01, ha="left", fontsize=11)
+        fig.tight_layout()
+        save_fig(fig, topic, name, reports_dir)
+
+    # ===== GMM 1: BIC + EM log-likelihood per iteration
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.8))
     ks = list(BIC_K_RANGE)
     a1.plot(ks, bic, color=C["blue"], marker="o", ms=6)
@@ -184,35 +275,28 @@ def make_graphs(pca, Xs, y, names, cum, need, pca_table, bic, best_k, trace, clu
     a1.annotate(f"lowest BIC: {best_k} components", (best_k, min(bic)), xytext=(-10, 18),
                 textcoords="offset points", ha="right", fontsize=9)
     a1.axvline(K, color=C["muted"], ls=":", lw=1)
-    a1.text(K, max(bic), f" {K} = number of diseases", fontsize=8, color=C["muted"], va="top")
+    a1.text(K, max(bic), f" {K} = number of classes", fontsize=8, color=C["muted"], va="top")
     a1.set_xlabel("number of Gaussian components"); a1.set_ylabel("BIC (lower = better)")
-    a1.set_title("Choosing the number of clusters with BIC"); a1.set_xticks(ks)
+    a1.set_title("Choosing the number of components with BIC"); a1.set_xticks(ks)
     a2.plot(np.arange(1, len(trace) + 1), trace, color=C["orange"], marker="o", ms=4)
     a2.set_xlabel("EM iteration"); a2.set_ylabel("average log-likelihood")
     a2.set_title(f"EM never decreases the likelihood ({K} components)")
-    save_fig(fig, "unsup_2_gmm_bic_em", reports_dir)
+    save_fig(fig, "gmm", "1_bic_and_em", reports_dir)
 
-    # -- 3. clusters vs true classes
-    from matplotlib.colors import LinearSegmentedColormap
-    seq = LinearSegmentedColormap.from_list("seq", ["#ffffff", "#c9dcf3", C["blue"], "#173f73"])
-    fig, axes = plt.subplots(1, len(clusters), figsize=(5.2 * len(clusters) + 1.5, 4.2), sharey=True)
-    for ax, (method, c) in zip(np.atleast_1d(axes), clusters.items()):
-        tab = pd.crosstab(pd.Series(y, name="class"), pd.Series(c, name="cluster"))
-        frac = tab.div(tab.sum(axis=1), axis=0).to_numpy()
-        im = ax.imshow(frac, cmap=seq, vmin=0, vmax=1, aspect="auto")
-        for i in range(frac.shape[0]):
-            for j in range(frac.shape[1]):
-                ax.text(j, i, f"{100 * frac[i, j]:.0f}", ha="center", va="center", fontsize=8,
-                        color="white" if frac[i, j] > 0.55 else C["ink"])
-        ax.set_yticks(range(len(names)), names, fontsize=8.5)
-        ax.tick_params(axis="y", labelleft=ax is np.atleast_1d(axes)[0])
-        ax.set_xticks(range(frac.shape[1]), [f"C{j + 1}" for j in tab.columns], fontsize=8.5)
-        ax.set_xlabel("cluster found without labels"); ax.grid(False)
-        sc = cluster_scores(y, c)
-        ax.set_title(f"{method}: ARI {sc['ARI']:.2f}, purity {100 * sc['Purity']:.0f}%", fontsize=10)
-    fig.colorbar(im, ax=axes, shrink=0.8, label="% of the class in each cluster")
-    fig.suptitle("Do the clusters match the diseases? (row = true class)", x=0.01, ha="left", fontsize=12)
-    save_fig(fig, "unsup_3_clusters_vs_classes", reports_dir)
+    # ===== GMM 2: soft assignments (how sure is each leaf's cluster membership?)
+    top = responsibilities.max(axis=1)
+    fig, ax = plt.subplots(figsize=(8, 3.8))
+    bins = np.linspace(1 / K, 1, 30)
+    is_h = healthy[y]
+    ax.hist(top[~is_h], bins=bins, color=C["diseased"], alpha=0.75, label="diseased leaves")
+    ax.hist(top[is_h], bins=bins, color=C["healthy"], alpha=0.75, label="healthy leaves")
+    ax.set_yscale("log")
+    ax.set_xlabel("largest responsibility  max_k p(cluster k | leaf)   (1 = certain)")
+    ax.set_ylabel("number of leaves (log scale)")
+    ax.legend(fontsize=9, loc="upper left")
+    ax.set_title(f"GMM soft clustering: {100 * (top > 0.9).mean():.0f}% of leaves are > 90% sure of their cluster "
+                 f"(k-means is always 100%)", fontsize=10)
+    save_fig(fig, "gmm", "2_soft_assignments", reports_dir)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -105,14 +105,14 @@ def test_training_pipeline_on_synthetic_leaves(tmp_path):
     assert bundle["n_leaves"] == 24 and bundle["cv"] == "leave-one-out"
     x = F.extract_features(paths[0])[0]
     assert abs(bundle["pipeline"].predict(x[None])[0] - spad[0]) < 3      # takes the full 55-feature vector
-    for name in ["chlorophyll_results.csv", "chlorophyll_2_pred_vs_actual.png",
-                 "chlorophyll_3_coefficient_stability.png"]:
-        assert (tmp_path / name).exists()
+    assert (config.tables_dir(tmp_path) / "chlorophyll_results.csv").exists()
+    for name in ["2_pred_vs_actual.png", "3_coefficient_stability.png"]:
+        assert (config.figure_dir("chlorophyll", tmp_path) / name).exists(), name
 
 
 def test_collinearity_report_runs_on_dataset_like_features(tmp_path):
     rng = np.random.default_rng(0)
     data = {"X_train": rng.normal(size=(60, F.N_FEATURES)), "X_valid": rng.normal(size=(20, F.N_FEATURES))}
     CH.run(tmp_path / "s.csv", reports_dir=tmp_path, models_dir=tmp_path, dataset_features=data)
-    assert (tmp_path / "chlorophyll_1_collinearity.png").exists()
-    assert (tmp_path / "chlorophyll_vif.csv").exists()
+    assert (config.figure_dir("chlorophyll", tmp_path) / "1_collinearity.png").exists()
+    assert (config.tables_dir(tmp_path) / "chlorophyll_vif.csv").exists()
