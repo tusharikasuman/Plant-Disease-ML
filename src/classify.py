@@ -37,7 +37,7 @@ import pandas as pd
 from sklearn.base import clone
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
@@ -103,6 +103,10 @@ def model_specs() -> list[ModelSpec]:
                   "Bagged ensemble of decision trees with random feature subsets",
                   RandomForestClassifier(n_estimators=200, random_state=s, n_jobs=1),
                   {"max_depth": [None, 20], "min_samples_leaf": [1, 2]}),
+        ModelSpec("gb", "Gradient Boosting", "Ensemble: boosting",
+                  "Trees added one after another, each fitting the errors of the ensemble so far",
+                  HistGradientBoostingClassifier(max_iter=300, random_state=s),
+                  {"learning_rate": [0.05, 0.1], "max_leaf_nodes": [15, 31]}),
     ]
 
 

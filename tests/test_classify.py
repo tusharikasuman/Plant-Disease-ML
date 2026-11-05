@@ -28,8 +28,8 @@ def fake_features(n_train=30, n_valid=10, seed=0) -> dict:
 
 def test_every_model_maps_to_a_syllabus_unit():
     specs = C.model_specs()
-    assert [s.key for s in specs] == ["lr", "lda", "gnb", "svm_linear", "svm_rbf", "knn", "tree", "rf"]
-    assert {s.unit for s in specs} == {"Unit 1", "Unit 2", "Baseline (Paper 1)"}
+    assert [s.key for s in specs] == ["lr", "lda", "gnb", "svm_linear", "svm_rbf", "knn", "tree", "rf", "gb"]
+    assert {s.unit for s in specs} == {"Unit 1", "Unit 2", "Baseline (Paper 1)", "Ensemble: boosting"}
     assert all(s.grid for s in specs)                     # every model is tuned
 
 
@@ -45,7 +45,7 @@ def test_full_run_writes_reports_and_models(tmp_path):
     data = fake_features()
     results = C.run(data, cv_per_class=None, n_jobs=1,
                     reports_dir=tmp_path / "reports", models_dir=tmp_path / "models")
-    assert len(results) == 8
+    assert len(results) == 9
     assert (results["Valid accuracy (%)"] > 80).all()       # easy data: every model should do well
     assert (results["Best"] == "*").sum() == 1
     for name in ["classification_results.csv", "classification_results.md", "ablation.csv", "ablation.md",

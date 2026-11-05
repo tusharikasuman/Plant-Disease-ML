@@ -34,7 +34,7 @@
  ③ FEATURES       55 hand-made numbers from LEAF PIXELS ONLY
     │             colour (6) · indices (4) · HSV histogram (32) · texture (6) · shape (7)
     ▼
- ④ MODELS         StandardScaler → classifier   (8 models compared)
+ ④ MODELS         StandardScaler → classifier   (9 models compared)
     │             + Bayesian logistic regression (healthy vs diseased, with uncertainty)
     │             + chlorophyll regression (SPAD, needs real meter readings)
     ▼
@@ -46,8 +46,9 @@
 |---|---|
 | ① Preprocess, ② Segment, ③ Features | `src/features.py` |
 | Find dataset, extract all features, cache | `src/dataset.py` |
-| ④ Disease classification (8 models) | `src/classify.py` |
+| ④ Disease classification (9 models) | `src/classify.py` |
 | ④ Bayesian logistic regression (from scratch) | `src/bayes_logreg.py` |
+| PCA, k-means, Gaussian mixture (EM) | `src/unsupervised.py` |
 | ④ Chlorophyll / SPAD regression | `src/chlorophyll.py` |
 | Metrics, tables, graphs | `src/evaluate.py` |
 | Predict one photo | `src/predict.py` |
@@ -86,6 +87,8 @@ Lesion fraction alone already separates the classes (mean per class):
 | SVM (linear kernel) | **Unit 2**: maximum margin | Widest gap between classes |
 | SVM (RBF kernel) | **Unit 2**: kernel trick | Curved boundaries via an implicit high-dimensional space |
 | KNN, Decision Tree, Random Forest | Baselines from **Paper 1** | Comparison with the published paper |
+| Gradient Boosting | Ensembles: **boosting** | Trees added one after another, each fixing the errors so far |
+| PCA, k-means, Gaussian mixture + EM | **Unsupervised learning** | Structure in the features without using labels |
 | Bayesian Logistic Regression | **Unit 2**: written from scratch in NumPy | Gaussian prior, Newton's method, Laplace approximation, probit predictive |
 | OLS / Ridge / Bayesian Ridge / polynomial | **Unit 2**: regression | Chlorophyll from colour (**Paper 2**) |
 
@@ -115,8 +118,9 @@ Lesion fraction alone already separates the classes (mean per class):
 
 | Model | CV accuracy | Test accuracy | Test balanced accuracy |
 |---|---|---|---|
-| **Random Forest** (best by CV) | **89.4 ± 0.8%** | **94.1%** | 90.4% |
-| SVM (RBF kernel) | 87.4 ± 1.1% | 93.3% | **91.6%** |
+| **Gradient Boosting** (best by CV) | **92.2 ± 1.0%** | **96.3%** | **94.1%** |
+| Random Forest | 89.4 ± 0.8% | 94.1% | 90.4% |
+| SVM (RBF kernel) | 87.4 ± 1.1% | 93.3% | 91.6% |
 | Logistic Regression | 84.0 ± 1.8% | 89.3% | 85.0% |
 | SVM (linear kernel) | 83.3 ± 1.5% | 88.5% | 82.8% |
 | KNN (k = 9) | 80.4 ± 1.7% | 87.8% | 81.0% |
@@ -125,11 +129,12 @@ Lesion fraction alone already separates the classes (mean per class):
 | Gaussian Naive Bayes | 64.5 ± 1.4% | 71.1% | 64.2% |
 
 **Key messages**
-1. **The kernel trick works:** RBF SVM beats linear SVM by about 4 points.
-2. **Ensembles help:** Random Forest beats a single decision tree by about 14 points.
+1. **Ensembles win:** a single decision tree gets 75.8% CV; bagging (Random Forest) 89.4%;
+   boosting (Gradient Boosting) **92.2%**.
+2. **The kernel trick works:** RBF SVM beats linear SVM by about 4 points.
 3. **Naive Bayes is last** because its independence assumption is false: R and G are 91% correlated.
-4. **Hardest class: early blight** (70% recall vs 99% for healthy). It gets confused with late blight,
-   since both are brown-spot diseases.
+4. **Hardest class: early blight** (82.5% recall with Gradient Boosting, vs 99% for healthy). It gets
+   confused with late blight, since both are brown-spot diseases.
 
 ### Feature ablation (what each feature group adds, RBF SVM, 5-fold CV)
 
@@ -141,6 +146,29 @@ Lesion fraction alone already separates the classes (mean per class):
 | + shape (Hu moments) | 55 | 87.4% |
 
 Colour features matter most (+13 points), and texture adds a further 2 points.
+
+### Unsupervised learning (PCA, k-means, Gaussian mixture + EM)
+
+Run on the 9,302 training leaves; the disease labels are used **only afterwards**, to score the clusters.
+
+- **PCA:** 55 features, but **30 components keep 95%** of the variance (17 keep 80%), because many
+  features are correlated. PC1 explains 16.8%, PC2 10.0%.
+- **Logistic regression on the top-k components:** 2 PCs 47.4% → 10 PCs 68.4% → 30 PCs 80.4% →
+  all 55 features 83.1% (5-fold CV). Fewer dimensions cost accuracy here.
+- **Clustering into 5 groups without labels** (on the 30 PCs):
+
+| Method | ARI | NMI | Purity |
+|---|---|---|---|
+| k-means | 0.22 | 0.25 | 59% |
+| Gaussian mixture (EM) | 0.22 | 0.25 | 58% |
+| Random assignment (reference) | 0.00 | 0.00 | 46% |
+
+- **Honest message:** the features separate diseases well **with** labels (92% supervised) but only
+  weakly **without** them. Healthy leaves cluster best (84% in one GMM cluster).
+- **BIC** prefers 11 Gaussian components rather than 5 (lowest of 1–12 tried): the data has more
+  natural groups than diseases. For example, healthy leaves form two separate groups in the PCA plot,
+  which matches the two photo backgrounds in the dataset.
+- **EM** increases the log-likelihood at every iteration (−21.8 → −10.6), as theory says it must.
 
 ### Bayesian logistic regression (healthy vs diseased)
 
@@ -177,7 +205,7 @@ streamlit run app.py
 | Page | What it shows |
 |---|---|
 | **Diagnose a leaf** | Original / mask / lesions, diagnosis, confidence, lesion %, top-3 chart, Bayesian second opinion, "Why this prediction?" |
-| **Model results** | All 8 models compared, ablation chart, per-class precision / recall / F1 |
+| **Model results** | All 9 models compared, ablation chart, per-class precision / recall / F1, PCA and clustering graphs |
 | **Bayesian LR** | 7 graphs with plain-English explanations |
 | **Chlorophyll** | Calibration status, how to collect SPAD readings, "Why Ridge?" collinearity graph |
 | **How it works** | Pipeline, the 55 features, syllabus mapping, references |
@@ -198,7 +226,7 @@ streamlit run app.py
 | NumPy / SciPy | Bayesian logistic regression written from scratch |
 | matplotlib | All graphs (white background, colour-blind-safe colours) |
 | Streamlit | Web app |
-| pytest | 59 automated tests |
+| pytest | 62 automated tests |
 | Git / GitHub | Version control |
 
 Runs on a normal laptop CPU (8 GB RAM) and in Google Colab.
@@ -224,9 +252,14 @@ about 94% accuracy.
 The test set has many easy yellow-leaf-curl leaves, and the final model trains on more data.
 That is why we also report **balanced accuracy**, which weighs every class equally.
 
-**Why is Random Forest the best?**
-Averaging 200 trees, each trained on random samples and random features, reduces variance,
-which a single decision tree has a lot of.
+**Why is Gradient Boosting the best?**
+It adds trees one after another, each correcting the mistakes of the trees before it, which reduces
+bias. Random Forest instead averages independent trees, which reduces variance. Both beat a single
+decision tree by a wide margin (92.2% and 89.4% vs 75.8% CV accuracy).
+
+**Why does clustering do worse than classification?**
+Clustering never sees the labels. The biggest differences between leaves (lighting, background, leaf
+age) are not always the differences between diseases, so the clusters only partly match them.
 
 **What does the Bayesian model add?**
 An honest confidence. It knows when a leaf looks unfamiliar, so the app can say "refer to an expert".
@@ -246,8 +279,9 @@ not chlorophyll. Once readings are collected, `python -m src.chlorophyll` trains
 ```
 pip install -r requirements.txt        # once
 python -m src.dataset                  # extract the 55 features (cached)
-python -m src.classify                 # train and compare the 8 models
+python -m src.classify                 # train and compare the 9 models
 python -m src.bayes_logreg             # Bayesian logistic regression
+python -m src.unsupervised             # PCA, k-means, Gaussian mixture (EM)
 python -m src.chlorophyll              # collinearity analysis; trains only with real SPAD data
 python -m src.evaluate                 # regenerate graphs
 streamlit run app.py                   # web app
