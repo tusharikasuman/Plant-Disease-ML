@@ -347,7 +347,7 @@ TOPIC_TITLES = {
     "features": "Feature representation", "pca": "PCA", "kmeans": "k-means", "gmm": "GMM + EM",
     "tree": "Decision trees", "rf": "Bagging / Random Forest", "boosting": "Boosting", "knn": "KNN",
     "cv": "CV & model selection", "metrics": "Evaluation metrics", "ablation": "Ablation",
-    "bayes": "Bayesian LR", "chlorophyll": "Chlorophyll",
+    "bayes": "Bayesian LR", "chlorophyll": "Chlorophyll", "hmm": "HMM (Viterbi, forward-backward)",
 }
 
 

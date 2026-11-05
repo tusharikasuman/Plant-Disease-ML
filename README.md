@@ -19,6 +19,8 @@ plant-disease-ml/
 │   ├── unsupervised.py       PCA, k-means, Gaussian mixture (EM)
 │   ├── bayes_logreg.py       Bayesian logistic regression from scratch (NumPy)
 │   ├── chlorophyll.py        SPAD regression (trains only on real meter readings)
+│   ├── hmm.py                Hidden Markov Model on leaf image rows: forward-backward + Viterbi (NumPy)
+│   ├── leaf_unsupervised.py  PCA, k-means, GMM/EM and HMM on the pixels of ONE leaf photo
 │   ├── figures.py            all supervised-learning graphs
 │   ├── evaluate.py           metrics, tables, graph style; `python -m src.evaluate` makes every graph
 │   └── predict.py            predict one leaf photo
@@ -44,7 +46,7 @@ plant-disease-ml/
     │   ├── 04_gmm_em/                   ├── 11_ablation/
     │   ├── 05_decision_trees/           ├── 12_bayesian_logistic_regression/
     │   ├── 06_bagging_random_forest/    └── 13_chlorophyll/
-    │   └── 07_boosting/
+    │   ├── 07_boosting/                 └── 14_hmm_viterbi_forward_backward/
     └── tables/               every result as CSV + Markdown
 ```
 
@@ -70,6 +72,8 @@ automatically). Without it, `python -m src.dataset` prints download instructions
 | 4. Unsupervised | `python -m src.unsupervised` | PCA, k-means, GMM graphs and tables |
 | 5. Bayesian LR | `python -m src.bayes_logreg` | `models/bayes_logreg.joblib`, graphs, tables |
 | 6. Chlorophyll | `python -m src.chlorophyll` | collinearity graph; a SPAD model only with real readings |
+| 7. HMM | `python -m src.hmm` | forward-backward and Viterbi on leaf image rows |
+| One photo, Unit 3 | `python -m src.leaf_unsupervised samples/tomato_early_blight.jpg` | PCA, k-means, GMM, HMM on that photo's pixels |
 | Web app | `streamlit run app.py` | opens http://localhost:8501 |
 | One photo | `python -m src.predict samples/tomato_early_blight.jpg` | top-3 diseases, lesion %, greenness |
 | Tests | `python -m pytest -q` | 75 tests |

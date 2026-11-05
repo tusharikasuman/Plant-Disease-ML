@@ -99,7 +99,7 @@ def main(argv: list[str] | None = None) -> int:
 
     python -m src.evaluate          supervised graphs (features, trees, forests, boosting, KNN, CV, metrics,
                                     ablation) from the feature cache and the saved results of src.classify
-    python -m src.evaluate --all    also re-runs src.unsupervised, src.bayes_logreg and src.chlorophyll
+    python -m src.evaluate --all    also re-runs src.unsupervised, src.bayes_logreg, src.chlorophyll and src.hmm
     """
     import argparse
     ap = argparse.ArgumentParser(description="Regenerate every graph into reports/figures/<topic>/.")
@@ -119,13 +119,18 @@ def main(argv: list[str] | None = None) -> int:
     figures.make_all(data)
 
     if args.all and data is not None:
-        from src import bayes_logreg, chlorophyll, unsupervised
+        from src import bayes_logreg, chlorophyll, hmm, unsupervised
         print("\nPCA, k-means, GMM:")
         unsupervised.run(data)
         print("\nBayesian logistic regression:")
         bayes_logreg.run(data)
         print("\nChlorophyll:")
         chlorophyll.run(dataset_features=data)
+        print("\nHMM (forward-backward, Viterbi):")
+        try:
+            hmm.run(data)
+        except FileNotFoundError as e:
+            print(f"  skipped: {e}")
     return 0
 
 

@@ -34,6 +34,7 @@ FIG = {
     "ablation": "11_ablation",
     "bayes": "12_bayesian_logistic_regression",
     "chlorophyll": "13_chlorophyll",
+    "hmm": "14_hmm_viterbi_forward_backward",
 }
 
 
