@@ -23,7 +23,8 @@ plant-disease-ml/
 │   ├── leaf_unsupervised.py  PCA, k-means, GMM/EM and HMM on the pixels of ONE leaf photo
 │   ├── figures.py            all supervised-learning graphs
 │   ├── evaluate.py           metrics, tables, graph style; `python -m src.evaluate` makes every graph
-│   └── predict.py            predict one leaf photo
+│   ├── predict.py            predict one leaf photo
+│   └── assistant.py          Q&A: TF-IDF + nearest-neighbour question matching, live answers
 ├── tests/                    pytest tests (python -m pytest -q)
 ├── docs/
 │   ├── PROJECT_OVERVIEW.md   architecture, results, presentation guide
@@ -75,6 +76,7 @@ automatically). Without it, `python -m src.dataset` prints download instructions
 | 7. HMM | `python -m src.hmm` | forward-backward and Viterbi on leaf image rows |
 | One photo, Unit 3 | `python -m src.leaf_unsupervised samples/tomato_early_blight.jpg` | PCA, k-means, GMM, HMM on that photo's pixels |
 | Web app | `streamlit run app.py` | opens http://localhost:8501 |
+| Ask questions | `python -m src.assistant --image samples/tomato_early_blight.jpg` | chat: answers from the models and result tables |
 | One photo | `python -m src.predict samples/tomato_early_blight.jpg` | top-3 diseases, lesion %, greenness |
 | Tests | `python -m pytest -q` | 75 tests |
 

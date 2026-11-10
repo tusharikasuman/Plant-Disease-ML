@@ -19,6 +19,7 @@ import streamlit as st
 import config
 from src import features as F
 from src import predict as P
+from src import assistant as A
 
 st.set_page_config(page_title="Leaf Doctor - classical ML", page_icon="🌿", layout="wide")
 
@@ -88,6 +89,7 @@ def page_diagnose(models):
     with st.spinner("Analysing leaf..."):
         pred = P.predict(img, models)
         views = F.segmented_views(img)
+    st.session_state["leaf"] = (source, pred)          # the "Ask questions" page talks about this leaf
 
     # ---- the three images
     st.subheader("1 · Segmentation")
@@ -404,13 +406,57 @@ explainable measurement of the leaf.
 """)
 
 
+# ----------------------------------------------------------------------------- page: ask questions
+@st.cache_resource
+def get_assistant():
+    return A.get_assistant()
+
+
+def page_ask(models):
+    st.title("💬 Ask Leaf Doctor")
+    st.write("Type a question about the leaf, the diseases or the project. Answers are computed live from the "
+             "trained models and result tables (TF-IDF + nearest-neighbour matching, classical ML).")
+    leaf = st.session_state.get("leaf")
+    samples = sorted(config.SAMPLES_DIR.glob("*.jpg"))
+    with st.expander("Leaf to ask about", expanded=leaf is None):
+        upload = st.file_uploader("Leaf photo (JPG / PNG)", type=["jpg", "jpeg", "png"], key="ask_upload")
+        choice = st.selectbox("...or a sample leaf", ["-"] + [s.name for s in samples], key="ask_sample")
+        if models is not None and (upload is not None or choice != "-"):
+            data, source = (upload.getvalue(), upload.name) if upload is not None else \
+                ((config.SAMPLES_DIR / choice).read_bytes(), choice)
+            if leaf is None or leaf[0] != source:
+                img = F.decode_image(data)
+                if img is not None:
+                    leaf = (source, P.predict(img, models))
+                    st.session_state["leaf"] = leaf
+    if leaf is not None:
+        st.caption(f"Talking about **{leaf[0]}** - predicted {pretty(leaf[1].label)}.")
+    ctx = A.Context(prediction=leaf[1] if leaf else None, models=models, source=leaf[0] if leaf else None)
+
+    history = st.session_state.setdefault("chat", [])
+    for role, text in history:
+        st.chat_message(role).markdown(text)
+    sugg = A.SUGGESTIONS_LEAF if leaf else A.SUGGESTIONS_PROJECT
+    cols = st.columns(len(sugg))
+    clicked = next((s for col, s in zip(cols, sugg) if col.button(s, key=f"sugg_{s}")), None)
+    question = st.chat_input("Ask a question...") or clicked
+    if question:
+        ans = get_assistant().ask(question, ctx)
+        text = ans.text + ("".join(f"\n- {s}" for s in ans.suggestions))
+        history += [("user", question), ("assistant", text)]
+        st.rerun()
+    if history and st.button("Clear chat"):
+        st.session_state["chat"] = []
+        st.rerun()
+
+
 # ----------------------------------------------------------------------------- layout
 def main():
     models = get_models()
     with st.sidebar:
         st.markdown("## 🌿 Leaf Doctor")
         st.caption("Plant disease detection & chlorophyll estimation with classical machine learning")
-        page = st.radio("Page", ["Diagnose a leaf", "Model results", "All graphs", "Bayesian LR", "Chlorophyll",
+        page = st.radio("Page", ["Diagnose a leaf", "Ask questions", "Model results", "All graphs", "Bayesian LR", "Chlorophyll",
                                  "How it works"], label_visibility="collapsed")
         st.divider()
         if models is not None:
@@ -424,6 +470,8 @@ def main():
 
     if page == "Diagnose a leaf":
         page_diagnose(models)
+    elif page == "Ask questions":
+        page_ask(models)
     elif page == "Model results":
         page_results(models)
     elif page == "All graphs":
