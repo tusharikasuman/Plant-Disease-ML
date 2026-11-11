@@ -17,3 +17,6 @@ venv/
 .idea/
 Thumbs.db
 .DS_Store
+
+# terminal demo transcript (rewritten on every run)
+reports/demo_log.txt

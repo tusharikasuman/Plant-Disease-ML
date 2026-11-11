@@ -1,0 +1,14 @@
+Best model (by CV accuracy): Gradient Boosting  [learning_rate=0.1, max_leaf_nodes=31]
+Valid set: 2326 leaves (stratified 80/20 split of train)
+
+                                       precision    recall  f1-score   support
+
+                 Tomato: Early blight      0.882     0.825     0.853       200
+                  Tomato: Late blight      0.912     0.950     0.931       382
+           Tomato: Septoria leaf spot      0.957     0.952     0.955       354
+Tomato: Tomato Yellow Leaf Curl Virus      0.991     0.989     0.990      1072
+                      Tomato: healthy      0.987     0.991     0.989       318
+
+                             accuracy                          0.963      2326
+                            macro avg      0.946     0.941     0.943      2326
+                         weighted avg      0.963     0.963     0.963      2326

@@ -99,7 +99,8 @@ def main(argv: list[str] | None = None) -> int:
 
     python -m src.evaluate          supervised graphs (features, trees, forests, boosting, KNN, CV, metrics,
                                     ablation) from the feature cache and the saved results of src.classify
-    python -m src.evaluate --all    also re-runs src.unsupervised, src.bayes_logreg, src.chlorophyll and src.hmm
+    python -m src.evaluate --all    also re-runs src.unsupervised, src.bayes_logreg, src.chlorophyll, src.hmm
+                                    and src.unit5
     """
     import argparse
     ap = argparse.ArgumentParser(description="Regenerate every graph into reports/figures/<topic>/.")
@@ -119,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
     figures.make_all(data)
 
     if args.all and data is not None:
-        from src import bayes_logreg, chlorophyll, hmm, unsupervised
+        from src import bayes_logreg, chlorophyll, hmm, unit5, unsupervised
         print("\nPCA, k-means, GMM:")
         unsupervised.run(data)
         print("\nBayesian logistic regression:")
@@ -131,6 +132,8 @@ def main(argv: list[str] | None = None) -> int:
             hmm.run(data)
         except FileNotFoundError as e:
             print(f"  skipped: {e}")
+        print("\nUnit 5 (neural networks, combining models, kernels, sampling & graphical models):")
+        unit5.run(data)
     return 0
 
 

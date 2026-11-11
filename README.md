@@ -5,10 +5,32 @@ Detect plant leaf diseases from a photo and estimate leaf greenness with **class
 
 **Full explanation of the approach, results and likely questions:** [`docs/PROJECT_OVERVIEW.md`](docs/PROJECT_OVERVIEW.md)
 
+## Quick start: the guided terminal demo
+
+```
+pip install -r requirements.txt
+python demo.py
+```
+
+`demo.py` walks through the **whole project in the terminal**, one step per topic (Units 1, 2, 3 and 5,
+the classifiers, and the finished app). For every step it explains what is done and why (with the formulas),
+prints the real code from `src/` with file and line numbers, runs it live on the leaf data, draws the key result
+as a chart in the terminal, and lists the saved graphs with a note on how to read each one. Press Enter
+to go to the next step. Everything printed is also saved to `reports/demo_log.txt`.
+
+| Option | What it does |
+|---|---|
+| `--list` / `--step 6` | list the 12 steps / run only some of them |
+| `--no-pause` | run straight through (about 5 minutes) |
+| `--quick` | show saved results for the two slowest live runs (Unit 3) |
+| `--open` | also open every graph in the image viewer |
+| `--no-code`, `--no-colour`, `--ascii` | shorter / plain-text output |
+
 ## Folder structure
 
 ```
 plant-disease-ml/
+├── demo.py                   guided terminal demo of everything (python demo.py)
 ├── app.py                    Streamlit web app (streamlit run app.py)
 ├── config.py                 every path, seed and setting
 ├── requirements.txt
@@ -21,6 +43,8 @@ plant-disease-ml/
 │   ├── chlorophyll.py        SPAD regression (trains only on real meter readings)
 │   ├── hmm.py                Hidden Markov Model on leaf image rows: forward-backward + Viterbi (NumPy)
 │   ├── leaf_unsupervised.py  PCA, k-means, GMM/EM and HMM on the pixels of ONE leaf photo
+│   ├── unit5.py              Unit 5: neural network (backprop), AdaBoost, committees, SVM dual,
+│   │                         Gaussian process, RVM, MCMC, Gibbs/MRF, Bayesian network
 │   ├── figures.py            all supervised-learning graphs
 │   ├── evaluate.py           metrics, tables, graph style; `python -m src.evaluate` makes every graph
 │   ├── predict.py            predict one leaf photo
@@ -39,6 +63,7 @@ plant-disease-ml/
 ├── data/                     put the downloaded Kaggle dataset here
 ├── cache/                    features.npz (extracted features)
 ├── models/                   trained models (.joblib)
+│   ── generated, kept in git so the graphs are visible ───────────────
 └── reports/
     ├── figures/              every graph, one folder per topic:
     │   ├── 01_feature_representation/   ├── 08_knn/
@@ -47,7 +72,11 @@ plant-disease-ml/
     │   ├── 04_gmm_em/                   ├── 11_ablation/
     │   ├── 05_decision_trees/           ├── 12_bayesian_logistic_regression/
     │   ├── 06_bagging_random_forest/    └── 13_chlorophyll/
-    │   ├── 07_boosting/                 └── 14_hmm_viterbi_forward_backward/
+    │   ├── 07_boosting/                 ├── 14_hmm_viterbi_forward_backward/
+    │   │                                ├── 15_neural_networks/           (Unit 5)
+    │   │                                ├── 16_combining_models/          (Unit 5)
+    │   │                                ├── 17_kernel_methods/            (Unit 5)
+    │   │                                └── 18_sampling_graphical_models/ (Unit 5)
     └── tables/               every result as CSV + Markdown
 ```
 
@@ -74,11 +103,13 @@ automatically). Without it, `python -m src.dataset` prints download instructions
 | 5. Bayesian LR | `python -m src.bayes_logreg` | `models/bayes_logreg.joblib`, graphs, tables |
 | 6. Chlorophyll | `python -m src.chlorophyll` | collinearity graph; a SPAD model only with real readings |
 | 7. HMM | `python -m src.hmm` | forward-backward and Viterbi on leaf image rows |
+| 8. Unit 5 | `python -m src.unit5` (or `--part nn` / `combining` / `kernels` / `sampling`) | 11 graphs + tables, about 1.5 min |
+| **Guided demo** | `python demo.py` | everything above explained and run step by step in the terminal |
 | One photo, Unit 3 | `python -m src.leaf_unsupervised samples/tomato_early_blight.jpg` | PCA, k-means, GMM, HMM on that photo's pixels |
 | Web app | `streamlit run app.py` | opens http://localhost:8501 |
 | Ask questions | `python -m src.assistant --image samples/tomato_early_blight.jpg` | chat: answers from the models and result tables |
 | One photo | `python -m src.predict samples/tomato_early_blight.jpg` | top-3 diseases, lesion %, greenness |
-| Tests | `python -m pytest -q` | 75 tests |
+| Tests | `python -m pytest -q` | 96 tests |
 
 ## Current results (5-class tomato subset, 11,628 images)
 
@@ -88,6 +119,19 @@ automatically). Without it, `python -m src.dataset` prints download instructions
 | Random Forest | 89.4 ± 0.8% | 94.1% |
 | SVM (RBF kernel) | 87.4 ± 1.1% | 93.3% |
 | Logistic Regression | 84.0 ± 1.8% | 89.3% |
+
+### Unit 5 results (same leaves)
+
+| Topic | Result |
+|---|---|
+| Neural network (NumPy, backprop) | 93.2% held-out (sklearn MLP 93.0%, logistic regression 89.3%); gradient check error 2e-6 |
+| AdaBoost from scratch (300 stumps) | 84.0%, identical predictions to sklearn; one stump alone 52.1% |
+| Committees | stacking 91.8% beats every member (best member 89.3%) |
+| SVM dual | decision function rebuilt from 162 of 1,500 leaves (support vectors), matches sklearn to 1e-13 |
+| Gaussian process / RVM / SVR | lesion severity R² 0.84 / 0.76 / 0.80; RVM keeps 35 leaves, SVR 447; GP 95% interval covers 94% |
+| Metropolis-Hastings | posterior mean and std match the Laplace approximation |
+| Gibbs sampling in an MRF | noisy lesion mask: 15.0% wrong pixels → 2.1% |
+| Bayesian network | exact inference = rejection sampling = likelihood weighting = Gibbs (error ∝ 1/√N) |
 
 All 9 models, the Bayesian, unsupervised and chlorophyll results: [`docs/PROJECT_OVERVIEW.md`](docs/PROJECT_OVERVIEW.md).
 The full 38-class run needs the Kaggle dataset.

@@ -1,0 +1,5 @@
+Feature set,Groups,# features,SVM (RBF kernel) CV acc (%),SVM (RBF kernel) std,Logistic Regression CV acc (%),Logistic Regression std
+RGB stats only,rgb,6,73.11999999999999,2.292945703674644,61.239999999999995,2.496076921891633
++ indices + HSV histogram,rgb + indices + hsv,42,86.07999999999998,0.8541662601625057,79.71999999999998,1.577846633865283
++ texture (GLCM),rgb + indices + hsv + texture,48,88.08,0.8447484832777158,83.2,1.5594870951694322
++ shape (Hu moments) = all,rgb + indices + hsv + texture + shape,55,87.4,1.1099549540409297,84.00000000000001,1.7572706109191019

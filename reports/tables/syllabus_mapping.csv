@@ -1,0 +1,10 @@
+Model,Syllabus,Topic
+Logistic Regression,Unit 2,Probabilistic discriminative model; softmax fitted by MLE with L2 penalty (lambda = 1/C)
+LDA,Unit 2,"Linear discriminant functions; probabilistic generative model (Gaussians, shared covariance)"
+Gaussian Naive Bayes,Unit 1,Bayes' rule with class-conditional independence of features
+SVM (linear kernel),Unit 2,"Maximum-margin classifier, linear kernel (LinearSVC solver)"
+SVM (RBF kernel),Unit 2,Kernel trick: RBF kernel = maximum margin in an implicit feature space
+KNN,Baseline (Paper 1),Instance-based: majority vote of the k nearest leaves
+Decision Tree,Baseline (Paper 1),Axis-aligned if/else splits chosen by Gini impurity
+Random Forest,Baseline (Paper 1),Bagged ensemble of decision trees with random feature subsets
+Gradient Boosting,Ensemble: boosting,"Trees added one after another, each fitting the errors of the ensemble so far"

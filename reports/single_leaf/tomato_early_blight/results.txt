@@ -1,0 +1,76 @@
+Image: samples\tomato_early_blight.jpg  ->  256x256 = 65536 pixels, 7 features each
+
+================================================================
+1. PCA  (7 colour features per pixel)
+================================================================
+  component   variance  cumulative
+  PC1            76.2%       76.2%
+  PC2            13.0%       89.2%
+  PC3             8.3%       97.5%
+  PC4             2.3%       99.8%
+  PC5             0.2%      100.0%
+  PC6             0.0%      100.0%
+  PC7             0.0%      100.0%
+  -> 3 of 7 components keep 95% of the variance
+  PC1 is mostly: B (+0.43), R (+0.43), V (+0.42)
+
+================================================================
+2. k-means  (cluster the pixels by colour, no labels)
+================================================================
+  K        inertia  silhouette
+  2         162020       0.621
+  3         116810       0.506
+  4          80089       0.537
+  5          66242       0.488
+  6          55088       0.405
+  7          47720       0.405
+  8          41186       0.410
+  best silhouette: K = 2
+  With K = 3 (background / healthy / lesion):
+  background   34.1% of image
+  healthy      46.2% of image
+  lesion       19.6% of image
+  lesion area = 29.8% of the leaf
+
+================================================================
+3. GMM trained with EM  (soft clusters)
+================================================================
+  K     BIC (lower = better)
+  1                  -137606
+  2                  -299971
+  3                  -480374
+  4                  -485900
+  5                  -527734
+  6                  -544028
+  7                  -558222
+  8                  -568080
+  lowest BIC: K = 8
+  EM with K = 3, started from the k-means centres:
+  average log-likelihood -11.850 -> 12.007 in 35 iterations (times it went down: 0)
+  With K = 3:
+  background   29.9% of image
+  healthy      54.8% of image
+  lesion       15.4% of image
+  lesion area = 22.0% of the leaf
+  unsure pixels (top probability < 0.9): 0.8%
+
+================================================================
+4. HMM along each pixel row  (forward-backward + Viterbi)
+================================================================
+  Hidden states: background / healthy / lesion
+  Observations: each pixel's colour, rounded to 1 of 8 colour codes
+  Transition matrix A (estimated from the k-means labels, row = from, col = to):
+                background     healthy      lesion
+  background         0.954       0.035       0.011
+  healthy            0.023       0.882       0.095
+  lesion             0.023       0.221       0.756
+  Example row 231 (the row with the most leaf):
+    forward-backward: log P(row's colours | model) = -240.2
+    state changes along the row: k-means 22, Viterbi 5
+  Whole image: pixels where forward-backward is unsure (top prob < 0.9): 6.3%
+  Viterbi relabelled 7.2% of pixels compared with k-means (removes speckle)
+  Viterbi map:
+  background   34.3% of image
+  healthy      48.1% of image
+  lesion       17.6% of image
+  lesion area = 26.8% of the leaf

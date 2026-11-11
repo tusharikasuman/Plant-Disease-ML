@@ -91,6 +91,10 @@ Lesion fraction alone already separates the classes (mean per class):
 | Gradient Boosting | Ensembles: **boosting** | Trees added one after another, each fixing the errors so far |
 | PCA, k-means, Gaussian mixture + EM | **Unsupervised learning** | Structure in the features without using labels |
 | Bayesian Logistic Regression | **Unit 2**: written from scratch in NumPy | Gaussian prior, Newton's method, Laplace approximation, probit predictive |
+| Multilayer perceptron | **Unit 5**: neural networks, written from scratch | Backpropagation, gradient check, Adam, weight decay |
+| AdaBoost, committees, stacking | **Unit 5**: combining models | AdaBoost from scratch; voting and stacking of 5 models |
+| SVM dual, Gaussian process, RVM | **Unit 5**: kernel methods, sparse kernel machines | RVM from scratch; GP error bars; support vectors |
+| MCMC, Gibbs/MRF, Bayesian network | **Unit 5**: sampling methods, graphical models | Metropolis-Hastings, Ising model, exact vs sampled inference |
 | OLS / Ridge / Bayesian Ridge / polynomial | **Unit 2**: regression | Chlorophyll from colour (**Paper 2**) |
 
 **How we trained them fairly:**
@@ -185,6 +189,31 @@ Run on the 9,302 training leaves; the disease labels are used **only afterwards*
 - **Honest negative result:** on leaves like the training leaves, plain logistic regression is already
   well calibrated, and the extra Bayesian caution costs a little.
 
+### Unit 5 (`src/unit5.py`, graphs in `reports/figures/15_` to `18_`)
+
+**Neural networks.** A 55 → 32 tanh → 5 softmax network written in NumPy. Backpropagation agrees with
+numerical derivatives (worst relative error 2e-6). Held-out accuracy **93.2%** (sklearn's MLPClassifier with
+the same architecture: 93.0%; logistic regression, i.e. no hidden layer: 89.3%). Growing the hidden layer from
+1 to 128 units raises training accuracy to 99.7% while held-out accuracy levels off at about 94%: over-fitting.
+
+**Combining models.** AdaBoost (SAMME) written from scratch: one decision stump alone gets 52.1%; 300
+re-weighted stumps get **84.0%**, with the same predictions as sklearn's AdaBoost on 100% of leaves. A committee
+of 5 different models: average member error 16.4%, soft-vote committee error 11.3%; **stacking** (logistic
+regression on the members' probabilities) gets **91.8%**, better than every member.
+
+**Kernel methods.** The RBF SVM's decision function rebuilt by hand from the dual coefficients matches sklearn to
+1e-13 while using only **162 of 1,500** training leaves (the support vectors). Lesion severity (√lesion %) from 12
+colour + texture features: Gaussian process R² **0.84**, and its 95% interval contains 94% of held-out
+leaves; ARD switches off three GLCM inputs. The Relevance Vector Machine (from scratch) keeps only **35**
+training leaves (SVR: 447) for R² 0.76.
+
+**Sampling and graphical models.** Metropolis-Hastings (30,000 samples, 29% acceptance) on Bayesian logistic
+regression gives the same posterior means and standard deviations as the Laplace approximation, which
+confirms the approximation used in Unit 2. Gibbs sampling in an Ising Markov random field cleans a lesion mask
+with 15% random noise down to **2.1%** wrong pixels. A Bayesian network (Disease → lesion level, yellowing,
+texture; lesion → texture) learned by counting: exact inference by enumeration agrees with rejection
+sampling, likelihood weighting and Gibbs sampling, whose error falls like 1/√N.
+
 ### Chlorophyll (SPAD)
 
 - The colour features are highly collinear (variance inflation factor): **R 62, G 63, B 16,
@@ -211,11 +240,16 @@ streamlit run app.py
 | **Model results** | All 9 models compared, ablation chart, per-class precision / recall / F1 |
 | **All graphs** | Every graph of the project, one tab per topic |
 | **Bayesian LR** | 7 graphs with plain-English explanations |
+| **Unit 5** | Neural network, combining models, kernel methods, sampling & graphical models: results + graphs |
 | **Chlorophyll** | Calibration status, how to collect SPAD readings, "Why Ridge?" collinearity graph |
 | **How it works** | Pipeline, the 55 features, syllabus mapping, references |
 
 **Demo tip:** pick the sample "tomato early blight" and show the mask, the top-3 chart and the
 "Why this prediction?" panel.
+
+**Terminal demo:** `python demo.py` explains and runs every part of the project step by step (explanation,
+formulas, the real code, live results, terminal charts, and the saved graphs). `python demo.py --list` shows the
+12 steps; `--step N` runs one.
 
 ---
 
@@ -230,7 +264,7 @@ streamlit run app.py
 | NumPy / SciPy | Bayesian logistic regression written from scratch |
 | matplotlib | All graphs (white background, colour-blind-safe colours) |
 | Streamlit | Web app |
-| pytest | 75 automated tests |
+| pytest | 96 automated tests |
 | Git / GitHub | Version control |
 
 Runs on a normal laptop CPU (8 GB RAM) and in Google Colab.

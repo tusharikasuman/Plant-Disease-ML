@@ -1,0 +1,4 @@
+Method,Clusters,ARI,NMI,Purity
+k-means,5,0.219,0.25,0.59
+GMM (EM),5,0.215,0.247,0.584
+Random assignment (reference),5,0.0,0.0,0.461

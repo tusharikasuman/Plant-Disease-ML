@@ -1,0 +1,4 @@
+from \ to,background,healthy leaf,lesion
+background,0.9871,0.0104,0.0026
+healthy leaf,0.0159,0.9706,0.0134
+lesion,0.0514,0.1603,0.7883

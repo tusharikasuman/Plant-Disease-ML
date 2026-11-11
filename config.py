@@ -35,6 +35,11 @@ FIG = {
     "bayes": "12_bayesian_logistic_regression",
     "chlorophyll": "13_chlorophyll",
     "hmm": "14_hmm_viterbi_forward_backward",
+    # Unit 5 (src/unit5.py)
+    "nn": "15_neural_networks",
+    "combining": "16_combining_models",
+    "kernels": "17_kernel_methods",
+    "sampling": "18_sampling_graphical_models",
 }
 
 

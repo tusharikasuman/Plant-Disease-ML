@@ -293,6 +293,75 @@ Healthy vs diseased, written **from scratch in NumPy** (Unit 2: probabilistic di
                     st.dataframe(report("bayes_unseen_disease.csv").round(3), hide_index=True, width="stretch")
 
 
+# ----------------------------------------------------------------------------- page: unit 5
+UNIT5_PARTS = [
+    ("nn", "1 · Neural networks", "unit5_nn_results", """
+A **multilayer perceptron written from scratch in NumPy**: 55 inputs → 32 tanh hidden units → 5 softmax outputs.
+The gradients come from **error backpropagation**, checked against numerical derivatives (gradient check), and
+the weights are trained with mini-batch Adam and weight decay. The hidden layer learns its own non-linear
+features, so the network draws **curved** class boundaries that logistic regression cannot.""",
+     {"1_training_curves": "Error and accuracy per epoch: the gap between training and held-out leaves is "
+                           "over-fitting.",
+      "2_accuracy_vs_hidden_units": "Model complexity: more hidden units fit the training leaves better, "
+                                    "held-out accuracy levels off.",
+      "3_decision_boundaries_2d": "On 2 PCA inputs: straight boundaries (logistic regression) vs curved "
+                                  "boundaries (network)."}),
+    ("combining", "2 · Combining models", "unit5_combining", """
+**AdaBoost written from scratch** (SAMME, the multi-class form of Bishop's AdaBoost) with decision stumps: each
+round re-weights the leaves the earlier stumps got wrong. It gives the same predictions as sklearn's AdaBoost.
+**Committees** average the votes / probabilities of 5 different models; **stacking** trains a logistic
+regression on their outputs and beats every single member.""",
+     {"1_adaboost_rounds": "Error falls as stumps are added; later stumps face harder leaves (higher ε, "
+                           "smaller vote α).",
+      "2_committee_vs_members": "Single models (grey) vs committees (blue) and boosting (orange)."}),
+    ("kernels", "3 · Kernel methods & sparse kernel machines", "unit5_kernel_regression", """
+* **SVM dual:** the decision function is rebuilt by hand from the support vectors only (matches sklearn to
+  ~1e-13) - the other training leaves can be thrown away.
+* **Gaussian process regression** of disease severity (lesion %) from colour + texture, with error bars whose
+  95 % interval really contains ~95 % of held-out leaves; automatic relevance determination switches off
+  useless inputs.
+* **Relevance Vector Machine written from scratch**: as accurate as SVR but keeps far fewer training leaves.""",
+     {"1_svm_support_vectors_vs_C": "Fraction of training leaves kept as support vectors for each C.",
+      "2_gaussian_process_regression": "A GP on one input with its 95 % band, and every held-out leaf with "
+                                       "its error bar.",
+      "3_rvm_vs_svr_sparsity": "RVM predictions, and how many training leaves GP, SVR and RVM keep."}),
+    ("sampling", "4 · Sampling methods & graphical models", "unit5_bayes_net_posterior", """
+* **Metropolis-Hastings MCMC** samples the posterior of Bayesian logistic regression and confirms the Laplace
+  approximation used on the *Bayesian LR* page.
+* **Gibbs sampling in a Markov random field** (Ising model) cleans a lesion mask with 15 % noise.
+* **Bayesian network** Disease → lesion level, yellowing, texture (lesion → texture): exact inference by
+  enumeration vs rejection sampling, likelihood weighting and Gibbs sampling.""",
+     {"1_mcmc_vs_laplace": "MCMC traces and posterior samples vs the Laplace Gaussian.",
+      "2_gibbs_mrf_lesion_denoising": "Noisy lesion mask → Gibbs posterior → cleaned mask.",
+      "3_bayes_net_inference": "The network, exact vs sampled P(Disease | texture high), error vs samples."}),
+]
+
+
+def page_unit5():
+    st.title("🧠 Unit 5")
+    st.write("Neural networks, combining models, kernel methods & sparse kernel machines, sampling methods & "
+             "graphical models - all on the same 55 leaf features. Code: `src/unit5.py`. "
+             "Re-run: `python -m src.unit5`.")
+    if report("unit5_nn_results.csv") is None and report("unit5_combining.csv") is None:
+        st.error("No Unit 5 results yet. Run  `python -m src.unit5`  in the terminal.")
+        return
+    for tab, (topic, title, table, text, notes) in zip(st.tabs([p[1] for p in UNIT5_PARTS]), UNIT5_PARTS):
+        with tab:
+            st.markdown(text)
+            df = report(f"{table}.csv")
+            if df is not None:
+                st.dataframe(df.round(3), hide_index=True, width="stretch")
+            for name, caption in notes.items():
+                path = config.figure_dir(topic) / f"{name}.png"
+                if path.exists():
+                    st.markdown(f"**{caption}**")
+                    st.image(str(path), width="stretch")
+    mapping = report("unit5_syllabus_mapping.csv")
+    if mapping is not None:
+        st.subheader("Where every Unit 5 topic is")
+        st.dataframe(mapping, hide_index=True, width="stretch")
+
+
 # ----------------------------------------------------------------------------- page: chlorophyll
 def page_chlorophyll(models):
     st.title("🧪 Chlorophyll (SPAD)")
@@ -350,6 +419,8 @@ TOPIC_TITLES = {
     "tree": "Decision trees", "rf": "Bagging / Random Forest", "boosting": "Boosting", "knn": "KNN",
     "cv": "CV & model selection", "metrics": "Evaluation metrics", "ablation": "Ablation",
     "bayes": "Bayesian LR", "chlorophyll": "Chlorophyll", "hmm": "HMM (Viterbi, forward-backward)",
+    "nn": "Neural networks", "combining": "Combining models", "kernels": "Kernel methods",
+    "sampling": "Sampling & graphical models",
 }
 
 
@@ -361,7 +432,7 @@ def page_graphs():
     if not topics:
         st.error("No graphs yet. Run  `python -m src.evaluate`  in the terminal.")
         return
-    for tab, topic in zip(st.tabs([TOPIC_TITLES[t] for t in topics]), topics):
+    for tab, topic in zip(st.tabs([TOPIC_TITLES.get(t, config.FIG[t]) for t in topics]), topics):
         with tab:
             for g in sorted(config.figure_dir(topic).glob("*.png")):
                 st.markdown(f"**{g.stem.replace('_', ' ')}**  ·  `reports/figures/{config.FIG[topic]}/{g.name}`")
@@ -456,8 +527,8 @@ def main():
     with st.sidebar:
         st.markdown("## 🌿 Leaf Doctor")
         st.caption("Plant disease detection & chlorophyll estimation with classical machine learning")
-        page = st.radio("Page", ["Diagnose a leaf", "Ask questions", "Model results", "All graphs", "Bayesian LR", "Chlorophyll",
-                                 "How it works"], label_visibility="collapsed")
+        page = st.radio("Page", ["Diagnose a leaf", "Ask questions", "Model results", "All graphs", "Bayesian LR", "Unit 5",
+                                 "Chlorophyll", "How it works"], label_visibility="collapsed")
         st.divider()
         if models is not None:
             b = models["best"]
@@ -478,6 +549,8 @@ def main():
         page_graphs()
     elif page == "Bayesian LR":
         page_bayes()
+    elif page == "Unit 5":
+        page_unit5()
     elif page == "Chlorophyll":
         page_chlorophyll(models)
     else:

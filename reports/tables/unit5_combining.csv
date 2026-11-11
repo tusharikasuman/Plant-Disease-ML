@@ -1,0 +1,10 @@
+Model,Kind,Valid accuracy (%)
+Logistic Regression,member,89.29492691315563
+LDA,member,85.03869303525366
+Gaussian Naive Bayes,member,71.06620808254515
+KNN (k = 7),member,87.70421324161651
+Decision Tree (depth 10),member,84.8237317282889
+Committee - hard (majority) vote,committee,89.55288048151333
+Committee - soft vote (average probability),committee,88.69303525365434
+Stacking (logistic regression on members' outputs),committee,91.83147033533963
+AdaBoost from scratch (300 stumps),boosting,83.96388650042992

@@ -1,0 +1,6 @@
+Removed group,# features removed,CV acc (%),Drop (points)
+shape,7,88.08,-0.68
+indices,4,86.76,0.64
+rgb,6,86.44,0.96
+texture,6,84.84,2.56
+hsv,32,82.2,5.2

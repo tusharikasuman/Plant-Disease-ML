@@ -1,0 +1,13 @@
+Topic,Where,Graph
+Feed-forward network / multilayer perceptron,src/unit5.py MLP,"15_neural_networks/1, 3"
+Error backpropagation + gradient check,"MLP.gradients, gradient_check",15_neural_networks/1
+Network complexity / regularisation (weight decay),part_nn hidden-unit sweep,15_neural_networks/2
+"Committees (voting), stacking",part_combining,16_combining_models/2
+Boosting - AdaBoost from scratch,AdaBoostSAMME,16_combining_models/1
+"Tree-based models, bagging, random forest, gradient boosting","src/classify.py, src/figures.py","05_decision_trees, 06_bagging_random_forest, 07_boosting"
+"Kernel trick, dual representation, support vectors",svm_decision_by_hand,17_kernel_methods/1
+Gaussian processes (regression),part_kernels,17_kernel_methods/2
+Relevance vector machine (sparse Bayesian kernel model),RVMRegression,17_kernel_methods/3
+Markov chain Monte Carlo - Metropolis-Hastings,metropolis_hastings,18_sampling_graphical_models/1
+Markov random field + Gibbs sampling,ising_gibbs,18_sampling_graphical_models/2
+"Bayesian network: exact inference, rejection sampling, likelihood weighting, Gibbs",DiscreteBayesNet,18_sampling_graphical_models/3
