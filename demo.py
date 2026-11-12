@@ -205,6 +205,13 @@ def bars(labels, values, unit="%", vmax=None, colour=green, digits=1, highlight=
         print(f"    {str(lab):<{w}} │{col(block * n)}{' ' * (full - n)} {v:.{digits}f}{unit}")
 
 
+def values(labels, vals, unit="%", digits=1):
+    """Aligned list of numbers (no chart) - used outside Unit 5, which is the only unit with graphs."""
+    w = max(len(str(lab)) for lab in labels)
+    for lab, v in zip(labels, vals):
+        print(f"    {str(lab):<{w}}  {v:.{digits}f}{unit}")
+
+
 def line_chart(series: dict, title: str, xlabel: str = "", ylabel: str = "", xs=None, logx=False):
     """A line chart in the terminal (plotext). Falls back to a list of numbers if plotext is missing."""
     try:
@@ -236,6 +243,7 @@ def line_chart(series: dict, title: str, xlabel: str = "", ylabel: str = "", xs=
 
 
 GRAPH_NOTES: dict[str, str] = {}
+UNIT5_TOPICS = ("nn", "combining", "kernels", "sampling")      # the only graphs kept in the project
 
 
 def graphs(topic: str, notes: dict[str, str] | None = None):
@@ -334,6 +342,15 @@ def short(name: str) -> str:
 
 
 SAMPLE = config.SAMPLES_DIR / "tomato_early_blight.jpg"
+_SCRATCH = {}
+
+
+def scratch() -> Path:
+    """Throw-away output folder for the earlier units: only Unit 5 graphs are kept in reports/figures."""
+    if "dir" not in _SCRATCH:
+        import tempfile
+        _SCRATCH["dir"] = tempfile.TemporaryDirectory(prefix="leaf_demo_")
+    return Path(_SCRATCH["dir"].name)
 
 
 # =============================================================================================================
@@ -393,7 +410,7 @@ def s_welcome():
         print(f"         classes: " + ", ".join(short(c) for c in d["class_names"]))
         counts = np.bincount(d["y_train"], minlength=len(d["class_names"]))
         print()
-        bars([short(c) for c in d["class_names"]], counts.tolist(), unit=" leaves", digits=0)
+        values([short(c) for c in d["class_names"]], counts.tolist(), unit=" leaves", digits=0)
     except FileNotFoundError:
         print(f"    {bad} no feature cache - download the Kaggle dataset into data/ and run  python -m src.dataset")
     for name, path in [("best classifier", config.BEST_MODEL_PATH), ("Bayesian LR", config.BAYES_MODEL_PATH),
@@ -452,15 +469,9 @@ def s_features():
     li = d["feature_names"].index("Lesion fraction")
     means = [100 * d["X_train"][d["y_train"] == k, li].mean() for k in range(len(d["class_names"]))]
     order = np.argsort(means)
-    bars([short(d["class_names"][k]) for k in order], [means[k] for k in order])
+    values([short(d["class_names"][k]) for k in order], [means[k] for k in order])
     para("Healthy leaves have almost no brown pixels; the blights have the most. One feature is not enough to "
          "tell all 5 apart, so the models combine all 55.")
-    section("Graphs")
-    graphs("features", {
-        "1_segmentation_examples": "Photo → leaf mask → lesion mask for leaves of every class. Check that the "
-                                   "mask follows the leaf edge and the lesions are marked.",
-        "2_key_features_by_class": "Distribution of the most useful features per class: where the boxes do "
-                                   "not overlap, that feature separates those diseases."})
     del cv2
 
 
@@ -510,8 +521,7 @@ def s_unit1():
     post = np.exp(lp - lp.max())
     post /= post.sum()
     print(f"\n    Posterior P(class | x) for {SAMPLE.name}:")
-    bars([short(n) for n in d["class_names"]], (100 * post).tolist(), vmax=100,
-         highlight=short(d["class_names"][int(post.argmax())]))
+    values([short(n) for n in d["class_names"]], (100 * post).tolist())
     guess = d["class_names"][int(post.argmax())]
     if "early_blight" in guess.lower():
         para("Naive Bayes picks the right disease for this leaf.")
@@ -580,16 +590,7 @@ def s_unit2():
     """)
     show_code(bayes_logreg.BayesianLogisticRegression.fit, 40)
     with timed("Bayesian logistic regression (fit, evidence, uncertainty tests)"), indented():
-        bayes_logreg.run(d)
-    section("Graphs")
-    graphs("bayes", {
-        "1_uncertainty_2d": "Left: P(diseased); right: uncertainty. It is low near the training leaves and grows "
-                            "away from them - the model knows what it has not seen.",
-        "2_confidence_vs_error": "Wrong answers have low confidence: sending the least-confident leaves to an "
-                                 "expert raises the accuracy on the rest.",
-        "3_unseen_disease": "One disease hidden from training: the Bayesian predictive is less over-confident "
-                            "on it.",
-        "4_weights": "Every weight with a 95% credible interval; intervals that cross 0 = not pinned down."})
+        bayes_logreg.run(d, reports_dir=scratch())
 
     section("Linear regression: chlorophyll (SPAD) from colour  (src/chlorophyll.py, Paper 2)")
     para("""
@@ -599,11 +600,7 @@ def s_unit2():
     the project never invents chlorophyll numbers; until then it reports an uncalibrated greenness index.
     """)
     with timed("chlorophyll analysis"), indented():
-        chlorophyll.run(dataset_features=d)
-    graphs("chlorophyll", {"1_collinearity": "Correlation of R, G, B and their variance inflation factors: "
-                                             "why ridge is needed."})
-    graphs("cv", {"2_svm_grid_search": "SVM accuracy for every (C, gamma): the grid search picks the brightest "
-                                       "cell by 5-fold CV."})
+        chlorophyll.run(dataset_features=d, reports_dir=scratch())
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -634,17 +631,7 @@ def s_unit3():
         table_file("unsup_clustering", 10)
     else:
         with timed("PCA, k-means and GMM/EM on the 55 features"), indented():
-            unsupervised.run(data())
-    section("Graphs")
-    graphs("pca", {"1_pca_scatter_scree": "Leaves on the first 2 principal components (colour = true disease, "
-                                          "NOT used by PCA) and the variance kept by each component.",
-                   "2_accuracy_vs_components": "Classifier accuracy using only the first m components."})
-    graphs("kmeans", {"1_elbow_silhouette": "Choosing k: the elbow of the within-cluster distance and the "
-                                            "silhouette score.",
-                      "2_clusters_vs_classes": "Which diseases end up in which cluster."})
-    graphs("gmm", {"1_bic_and_em": "BIC picks the number of Gaussians; EM's log-likelihood rises every "
-                                   "iteration.",
-                   "2_clusters_vs_classes": "GMM clusters vs the true diseases."})
+            unsupervised.run(data(), reports_dir=scratch())
 
     section("Unit 3 on ONE photo: PCA, k-means, GMM and an HMM on the pixels of " + SAMPLE.name, green)
     show_code(leaf_unsupervised.viterbi, 20)
@@ -654,18 +641,9 @@ def s_unit3():
         for ln in (out / "results.txt").read_text(encoding="utf-8").splitlines():
             print("    " + ln)
     else:
-        run_module(["src.leaf_unsupervised", str(SAMPLE.relative_to(ROOT))])
-    for f in sorted(out.glob("*.png")):
-        print(f"    {blue('■' if not ARGS.ascii else '*')} {f.relative_to(ROOT)}")
-        if ARGS.open:
-            open_file(f)
+        run_module(["src.leaf_unsupervised", str(SAMPLE.relative_to(ROOT)), "--out", str(scratch())])
     section("HMM on the dataset (forward-backward + Viterbi along image rows, src/hmm.py) - saved results")
     table_file("hmm_decoding", 8)
-    graphs("hmm", {"1_viterbi_and_forward_backward_leaves": "Per-pixel states of whole leaves: emission-only vs "
-                                                            "forward-backward vs Viterbi (smoother).",
-                   "2_one_row_forward_backward_viterbi": "One pixel row: posterior probability of each state "
-                                                         "and the Viterbi path.",
-                   "3_learned_parameters": "Learned transition matrix A and emission probabilities B."})
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -689,14 +667,12 @@ def s_classify():
     if ARGS.retrain:
         section("--retrain: re-running the full grid search (slow)", green)
         run_module(["src.classify"])
-        run_module(["src.evaluate"])
     section("Results (5-fold CV and held-out), from src/classify.py", green)
     import pandas as pd
     path = config.tables_dir() / "classification_results.csv"
     if path.exists():
         r = pd.read_csv(path).sort_values("Valid accuracy (%)")
-        bars(r["Model"].tolist(), r["Valid accuracy (%)"].tolist(), vmax=100,
-             highlight=r.iloc[-1]["Model"])
+        values(r["Model"].tolist(), r["Valid accuracy (%)"].tolist())
         scores = json.loads((config.tables_dir() / "classification_scores.json").read_text())
         best = scores["models"][scores["best_model"]]
         print(f"\n    best model by CV: {bold(best['name'])}  ({best['params']})")
@@ -711,24 +687,6 @@ def s_classify():
          "really had it, how many we found. F1 = their harmonic mean.")
     section("Ablation: which feature groups matter?")
     table_file("ablation_leave_one_group_out", 8)
-    section("Graphs")
-    graphs("tree", {"1_depth_vs_overfitting": "Deeper trees fit training leaves perfectly but held-out "
-                                              "accuracy stops improving: over-fitting.",
-                    "2_tree_depth3": "The first 3 levels of a tree: readable if/else rules."})
-    graphs("rf", {"1_accuracy_vs_number_of_trees": "More trees = lower variance; accuracy levels off.",
-                  "2_feature_importance": "Which features the forest uses most."})
-    graphs("boosting", {"1_accuracy_per_round": "Gradient boosting: accuracy after every added tree.",
-                        "2_bagging_vs_boosting": "Bagging (parallel, lowers variance) vs boosting "
-                                                 "(sequential, lowers bias)."})
-    graphs("knn", {"1_accuracy_vs_k": "Small k = jumpy boundary (over-fit), large k = too smooth."})
-    graphs("cv", {"1_model_comparison": "All 9 models: CV accuracy with its spread, and held-out accuracy.",
-                  "3_learning_curve_best_model": "Accuracy vs number of training leaves: would more data help?"})
-    graphs("metrics", {"1_confusion_matrix": "Rows = true disease, columns = predicted: off-diagonal cells are "
-                                             "the confusions.",
-                       "2_precision_recall_f1": "Per-class precision, recall and F1.",
-                       "3_roc_curves": "One-vs-rest ROC curves; area under the curve near 1 = excellent."})
-    graphs("ablation", {"1_cumulative_ablation": "Accuracy as feature groups are added one at a time.",
-                        "2_leave_one_group_out": "Accuracy lost when one group is removed."})
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -926,14 +884,16 @@ def s_predict():
 
 @step("Summary: every graph, and how to run each part yourself", "wrap-up")
 def s_summary():
-    section("Every graph in the project (reports/figures/)")
+    section("The graphs of the project - Unit 5 (reports/figures/)")
     total = 0
     for topic, folder in config.FIG.items():
+        if topic not in UNIT5_TOPICS:
+            continue
         files = sorted((config.REPORTS_DIR / "figures" / folder).glob("*.png"))
         total += len(files)
         if files:
             print(f"    {folder:<36} {len(files)} graph{'s' if len(files) != 1 else ''}")
-    print(f"    {'':<36} {bold(str(total))} graphs in total  (+ single-leaf graphs in reports/single_leaf/)")
+    print(f"    {'':<36} {bold(str(total))} graphs in total")
     section("Syllabus → where it is")
     for unit, items in [
         ("Unit 1", "Bayes' rule, Naive Bayes, covariance / correlation           → step 2"),
@@ -949,7 +909,6 @@ def s_summary():
         ("streamlit run app.py", "web app: diagnose a photo, browse every result and graph"),
         ("python -m src.predict samples/tomato_early_blight.jpg", "diagnose one photo"),
         ("python -m src.unit5", "all of Unit 5 (or --part nn | combining | kernels | sampling)"),
-        ("python -m src.evaluate --all", "regenerate every graph"),
         ("python -m src.assistant --image samples/tomato_healthy.jpg", "chat with Leaf Doctor in the terminal"),
         ("python -m pytest -q", "run all the tests"),
     ]:

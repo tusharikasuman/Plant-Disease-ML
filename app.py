@@ -203,16 +203,6 @@ def page_results(models):
     c4.metric("Held-out balanced accuracy", f"{b['Valid balanced acc (%)']:.1f}%")
 
     st.subheader("All models")
-    order = res.sort_values("CV accuracy (%)")
-    fig, ax = plt.subplots(figsize=(8, 3.6))
-    y = np.arange(len(order))
-    ax.barh(y - 0.2, order["CV accuracy (%)"], 0.4, xerr=order["CV std"], color=GREEN,
-            label="5-fold CV accuracy", error_kw={"ecolor": "#555", "capsize": 2})
-    ax.barh(y + 0.2, order["Valid balanced acc (%)"], 0.4, color=BLUE, label="held-out balanced accuracy")
-    ax.set_yticks(y, [f"{m}  ({u})" for m, u in zip(order["Model"], order["Syllabus"])])
-    ax.set_xlim(max(0, order["Valid balanced acc (%)"].min() - 15), 100); ax.set_xlabel("%")
-    ax.legend(loc="lower right", frameon=False, fontsize=8)
-    st.pyplot(fig); plt.close(fig)
     st.dataframe(res.drop(columns=["Topic"]).round(2), hide_index=True, width="stretch")
     st.caption("CV = grid search + 5-fold stratified cross-validation on a class-balanced sample. "
                "Held-out = one final test on images never used for training or tuning. Balanced accuracy "
@@ -221,23 +211,13 @@ def page_results(models):
     abl = report("ablation.csv")
     if abl is not None:
         st.subheader("Feature ablation - what each feature group adds")
-        cols = [c for c in abl.columns if c.endswith("CV acc (%)")]
-        fig, ax = plt.subplots(figsize=(8, 3))
-        x = np.arange(len(abl))
-        for i, (col, color) in enumerate(zip(cols, [GREEN, BLUE])):
-            bars = ax.bar(x + (i - (len(cols) - 1) / 2) * 0.38, abl[col], 0.38, color=color,
-                          label=col.replace(" CV acc (%)", ""))
-            ax.bar_label(bars, fmt="%.1f", fontsize=8, padding=2)
-        ax.set_xticks(x, [f"{s}\n({n} features)" for s, n in zip(abl["Feature set"], abl["# features"])], fontsize=8)
-        ax.set_ylim(max(0, abl[cols].min().min() - 15), 100); ax.set_ylabel("5-fold CV accuracy (%)")
-        ax.legend(frameon=False, fontsize=8)
-        st.pyplot(fig); plt.close(fig)
+        st.dataframe(abl.round(2), hide_index=True, width="stretch")
 
     rep = config.tables_dir() / "classification_report_best.txt"
     if rep.exists():
         with st.expander("Per-class precision / recall / F1 of the best model"):
             st.code(rep.read_text(encoding="utf-8"))
-    st.caption("Every graph, by topic, is on the **All graphs** page.")
+    st.caption("The project's graphs (Unit 5) are on the **Unit 5** and **All graphs** pages.")
 
 
 # ----------------------------------------------------------------------------- page: bayesian
@@ -426,8 +406,8 @@ TOPIC_TITLES = {
 
 def page_graphs():
     st.title("🖼️ All graphs")
-    st.write("Every graph of the project, one tab per topic. The same PNG files are in "
-             "`reports/figures/<topic>/` for slides. Regenerate them with `python -m src.evaluate`.")
+    st.write("The graphs of the project (Unit 5), one tab per topic. The same PNG files are in "
+             "`reports/figures/<topic>/` for slides. Regenerate them with `python -m src.unit5`.")
     topics = [t for t in config.FIG if any(config.figure_dir(t).glob("*.png"))]
     if not topics:
         st.error("No graphs yet. Run  `python -m src.evaluate`  in the terminal.")

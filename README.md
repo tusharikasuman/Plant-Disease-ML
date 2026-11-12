@@ -15,7 +15,7 @@ python demo.py
 `demo.py` walks through the **whole project in the terminal**, one step per topic (Units 1, 2, 3 and 5,
 the classifiers, and the finished app). For every step it explains what is done and why (with the formulas),
 prints the real code from `src/` with file and line numbers, runs it live on the leaf data, draws the key result
-as a chart in the terminal, and lists the saved graphs with a note on how to read each one. Press Enter
+as a chart in the terminal (Unit 5), and lists the Unit 5 graphs with a note on how to read each one. Press Enter
 to go to the next step. Everything printed is also saved to `reports/demo_log.txt`.
 
 | Option | What it does |
@@ -65,18 +65,11 @@ plant-disease-ml/
 ├── models/                   trained models (.joblib)
 │   ── generated, kept in git so the graphs are visible ───────────────
 └── reports/
-    ├── figures/              every graph, one folder per topic:
-    │   ├── 01_feature_representation/   ├── 08_knn/
-    │   ├── 02_pca/                      ├── 09_cv_model_selection/
-    │   ├── 03_kmeans/                   ├── 10_evaluation_metrics/
-    │   ├── 04_gmm_em/                   ├── 11_ablation/
-    │   ├── 05_decision_trees/           ├── 12_bayesian_logistic_regression/
-    │   ├── 06_bagging_random_forest/    └── 13_chlorophyll/
-    │   ├── 07_boosting/                 ├── 14_hmm_viterbi_forward_backward/
-    │   │                                ├── 15_neural_networks/           (Unit 5)
-    │   │                                ├── 16_combining_models/          (Unit 5)
-    │   │                                ├── 17_kernel_methods/            (Unit 5)
-    │   │                                └── 18_sampling_graphical_models/ (Unit 5)
+    ├── figures/              the project's graphs - Unit 5 only, one folder per topic:
+    │   ├── 15_neural_networks/
+    │   ├── 16_combining_models/
+    │   ├── 17_kernel_methods/
+    │   └── 18_sampling_graphical_models/
     └── tables/               every result as CSV + Markdown
 ```
 
@@ -98,10 +91,10 @@ automatically). Without it, `python -m src.dataset` prints download instructions
 |---|---|---|
 | 1. Features | `python -m src.dataset` (`--limit 50` for a quick test) | `cache/features.npz` |
 | 2. Classifiers | `python -m src.classify` | `models/best_model.joblib`, `reports/tables/classification_*` |
-| 3. All graphs | `python -m src.evaluate --all` | every graph in `reports/figures/` (also runs steps 4–6) |
-| 4. Unsupervised | `python -m src.unsupervised` | PCA, k-means, GMM graphs and tables |
-| 5. Bayesian LR | `python -m src.bayes_logreg` | `models/bayes_logreg.joblib`, graphs, tables |
-| 6. Chlorophyll | `python -m src.chlorophyll` | collinearity graph; a SPAD model only with real readings |
+| 3. Earlier-unit graphs | `python -m src.evaluate --all` | (optional) re-creates the Units 1-3 graphs, which the project no longer keeps |
+| 4. Unsupervised | `python -m src.unsupervised` | PCA, k-means, GMM tables |
+| 5. Bayesian LR | `python -m src.bayes_logreg` | `models/bayes_logreg.joblib`, tables |
+| 6. Chlorophyll | `python -m src.chlorophyll` | collinearity table; a SPAD model only with real readings |
 | 7. HMM | `python -m src.hmm` | forward-backward and Viterbi on leaf image rows |
 | 8. Unit 5 | `python -m src.unit5` (or `--part nn` / `combining` / `kernels` / `sampling`) | 11 graphs + tables, about 1.5 min |
 | **Guided demo** | `python demo.py` | everything above explained and run step by step in the terminal |

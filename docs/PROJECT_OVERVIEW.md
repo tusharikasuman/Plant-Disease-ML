@@ -237,11 +237,11 @@ streamlit run app.py
 | Page | What it shows |
 |---|---|
 | **Diagnose a leaf** | Original / mask / lesions, diagnosis, confidence, lesion %, top-3 chart, Bayesian second opinion, "Why this prediction?" |
-| **Model results** | All 9 models compared, ablation chart, per-class precision / recall / F1 |
-| **All graphs** | Every graph of the project, one tab per topic |
-| **Bayesian LR** | 7 graphs with plain-English explanations |
+| **Model results** | All 9 models compared, ablation table, per-class precision / recall / F1 |
+| **All graphs** | The Unit 5 graphs, one tab per topic |
+| **Bayesian LR** | Results of the from-scratch Bayesian model |
 | **Unit 5** | Neural network, combining models, kernel methods, sampling & graphical models: results + graphs |
-| **Chlorophyll** | Calibration status, how to collect SPAD readings, "Why Ridge?" collinearity graph |
+| **Chlorophyll** | Calibration status, how to collect SPAD readings, "Why Ridge?" collinearity |
 | **How it works** | Pipeline, the 55 features, syllabus mapping, references |
 
 **Demo tip:** pick the sample "tomato early blight" and show the mask, the top-3 chart and the
@@ -314,24 +314,16 @@ not chlorophyll. Once readings are collected, `python -m src.chlorophyll` trains
 
 ## 9. Where the graphs are (for slides)
 
-Every graph is a PNG in `reports/figures/`, one numbered folder per topic. In the app, the
-**All graphs** page shows them in tabs.
+The project keeps only the **Unit 5** graphs: PNGs in `reports/figures/`, one numbered folder per topic. In
+the app, the **Unit 5** and **All graphs** pages show them. (The earlier units are shown with numbers and
+tables only; `python -m src.evaluate --all` can re-create their graphs if ever needed.)
 
 | Topic | Folder | Graphs |
 |---|---|---|
-| Feature representation | `01_feature_representation` | segmentation examples, 6 key features per class |
-| PCA | `02_pca` | scatter + scree plot, accuracy vs number of components |
-| k-means | `03_kmeans` | elbow + silhouette, clusters vs diseases |
-| GMM + EM | `04_gmm_em` | BIC + EM log-likelihood, clusters vs diseases |
-| Decision trees | `05_decision_trees` | depth vs over-fitting, the tree drawn (depth 3) |
-| Bagging / Random Forest | `06_bagging_random_forest` | accuracy vs number of trees, feature importance |
-| Boosting | `07_boosting` | accuracy per boosting round (3 learning rates), bagging vs boosting |
-| KNN | `08_knn` | accuracy vs k, with and without scaling |
-| CV & model selection | `09_cv_model_selection` | model comparison, SVM grid search, learning curve |
-| Evaluation metrics | `10_evaluation_metrics` | confusion matrix, precision / recall / F1 per class, ROC curves |
-| Ablation | `11_ablation` | cumulative ablation, leave-one-group-out |
-| Bayesian LR | `12_bayesian_logistic_regression` | uncertainty map, confidence vs errors, unseen disease, weights |
-| Chlorophyll | `13_chlorophyll` | correlation + VIF |
+| Neural networks | `15_neural_networks` | training curves, accuracy vs hidden units, decision boundaries (LR vs network) |
+| Combining models | `16_combining_models` | AdaBoost error and α per round, committees vs single members |
+| Kernel methods | `17_kernel_methods` | SVM support vectors vs C, Gaussian process with error bars, RVM vs SVR sparsity |
+| Sampling & graphical models | `18_sampling_graphical_models` | MCMC vs Laplace, Gibbs/MRF lesion denoising, Bayesian network inference |
 
 ---
 
@@ -344,7 +336,7 @@ python -m src.classify                 # train and compare the 9 models
 python -m src.bayes_logreg             # Bayesian logistic regression
 python -m src.unsupervised             # PCA, k-means, Gaussian mixture (EM)
 python -m src.chlorophyll              # collinearity analysis; trains only with real SPAD data
-python -m src.evaluate --all           # every graph -> reports/figures/<topic>/
+python -m src.unit5                    # Unit 5 + its graphs -> reports/figures/15_ ... 18_
 streamlit run app.py                   # web app
 python -m pytest -q                    # tests
 ```
