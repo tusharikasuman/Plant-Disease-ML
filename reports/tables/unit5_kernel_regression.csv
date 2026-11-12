@@ -1,4 +1,4 @@
 Model,Basis vectors kept,R2,RMSE,95% interval coverage (%),Fit time (s)
-"Gaussian process (ARD RBF + noise, hyper-parameters by marginal likelihood)",600,0.841587348342769,0.6444666644747117,94.25,14.531919479370117
-Relevance Vector Machine (from scratch),35,0.7614037228587281,0.790928741717946,90.5,1.549950122833252
+"Gaussian process (ARD RBF + noise, hyper-parameters by marginal likelihood)",600,0.841587348342769,0.6444666644747117,94.25,13.247618675231934
+Relevance Vector Machine (from scratch),35,0.7614037228587281,0.790928741717946,90.5,3.494239568710327
 Support Vector Regression (epsilon-insensitive),447,0.8041735803751641,0.7165412021935175,,

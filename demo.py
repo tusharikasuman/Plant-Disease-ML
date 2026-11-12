@@ -65,6 +65,7 @@ class Tee:
         self.file.write(ANSI.sub("", text))
         return len(text)
 
+
     def flush(self):
         self.stream.flush()
         self.file.flush()
