@@ -60,7 +60,7 @@ plant-disease-ml/
 ├── legacy/                   the original course scripts this project grew from
 │
 │   ── generated, not in git ──────────────────────────────────────────
-├── data/                     put the downloaded Kaggle dataset here
+├── data/PlantVillage_tomato/  the 11,628 leaf photos, one folder per class (200 MB)
 ├── cache/                    features.npz (extracted features)
 ├── models/                   trained models (.joblib)
 │   ── generated, kept in git so the graphs are visible ───────────────
@@ -81,9 +81,14 @@ pip install -r requirements.txt
 ```
 **Google Colab:** upload the folder (or clone the repo), then `!pip install -r requirements.txt`.
 
-**Dataset:** Kaggle "New Plant Diseases Dataset (Augmented)" -
+**Dataset used:** the tomato part of **PlantVillage** - 11,628 colour lab photos of single tomato leaves
+(256 × 256 JPG) in 5 classes - kept in `data/PlantVillage_tomato/<class name>/`. The photos are not in git
+(200 MB); copy that folder into `data/` on a new computer, then run `python -m src.dataset` to rebuild
+`cache/features.npz`.
+
+**Bigger dataset (optional, not used yet):** Kaggle "New Plant Diseases Dataset (Augmented)", 38 classes -
 https://www.kaggle.com/datasets/vipoooool/new-plant-diseases-dataset. Unzip it into `data/` (it is found
-automatically). Without it, `python -m src.dataset` prints download instructions.
+automatically). Without any dataset, `python -m src.dataset` prints download instructions.
 
 ## How to run
 
