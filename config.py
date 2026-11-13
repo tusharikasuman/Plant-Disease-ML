@@ -40,6 +40,8 @@ FIG = {
     "combining": "16_combining_models",
     "kernels": "17_kernel_methods",
     "sampling": "18_sampling_graphical_models",
+    # chlorophyll (SPAD) from real meter readings - coffee leaves (src/chlorophyll_coffee.py)
+    "spad": "19_chlorophyll_spad",
 }
 
 

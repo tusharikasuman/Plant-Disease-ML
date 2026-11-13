@@ -14,3 +14,4 @@ pandas>=2.0          # tables (CSV / Markdown reports, SPAD readings)
 streamlit>=1.50      # web app
 pytest>=7.4          # tests
 plotext>=5.2         # charts drawn inside the terminal (python demo.py)
+openpyxl>=3.1         # reads the ArabicaLens SPAD spreadsheet (coffee.xlsx)

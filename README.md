@@ -4,7 +4,8 @@ Detect tomato leaf diseases from a single photo using **classical machine learni
 Every photo is turned into **55 explainable numbers** (colour, greenness, lesion area, texture, shape), so every
 prediction can be explained. The project covers the machine-learning syllabus from Bayes' rule to neural
 networks, and **Unit 5** (neural networks, combining models, kernel methods, sampling and graphical models)
-is written largely from scratch in NumPy and checked against scikit-learn.
+is written largely from scratch in NumPy and checked against scikit-learn. It also **estimates chlorophyll
+(SPAD) from a leaf photo**, trained on real chlorophyll-meter readings of coffee leaves.
 
 **Run the whole project, explained step by step, in the terminal:**
 
@@ -33,6 +34,7 @@ python demo.py
     │                  · Unit 5 neural network, AdaBoost, committees, GP, RVM, MCMC, Gibbs, Bayes net
     ▼
     5. OUTPUT        disease + confidence, lesion %, "why this prediction?", terminal demo
+                     + chlorophyll (SPAD) for coffee leaves, with an error bar
 ```
 
 ## Dataset
@@ -52,7 +54,13 @@ in 5 classes. 80% is used for training and 20% is held out for one final test (s
 The photos (200 MB) are **not in this repository**. Put them in `data/PlantVillage_tomato/<class name>/`
 (one folder per class, e.g. `data/PlantVillage_tomato/Tomato___healthy/`). The code also finds the larger
 Kaggle ["New Plant Diseases Dataset"](https://www.kaggle.com/datasets/vipoooool/new-plant-diseases-dataset)
-(38 classes) if it is unzipped into `data/`; the results below use the 5-class tomato set only.
+(38 classes) if it is unzipped into `data/`; the disease results below use the 5-class tomato set only.
+
+**Chlorophyll data: ArabicaLens** ([Zenodo](https://zenodo.org/records/19447467), CC BY 4.0) - 425 photos of
+coffee (*Coffea arabica*) leaves on a white background, each measured **5 times with a SPAD chlorophyll meter**
+(SPAD 6 to 70). The tomato photos have no chlorophyll measurements, so chlorophyll can only be learned from a
+dataset like this. Download `coffee.xlsx` and `Images.zip` into `data/ArabicaLens/` and unzip the images there
+(`data/ArabicaLens/Images/cof_1.jpg` ...; 742 MB, not in this repository).
 
 ## Results
 
@@ -92,7 +100,30 @@ and it knows when it is unsure - wrong answers average 69% confidence, correct o
   <img src="reports/figures/18_sampling_graphical_models/2_gibbs_mrf_lesion_denoising.png" alt="Gibbs sampling in an Ising Markov random field cleans a noisy lesion mask" width="100%">
 </p>
 
-All 11 Unit 5 graphs are in [`reports/figures/`](reports/figures/) (folders `15_` to `18_`), every result
+### Chlorophyll (SPAD) estimation (`src/chlorophyll_coffee.py`)
+
+Every coffee photo goes through the same pipeline (segmentation → 55 features). Six regression models - least
+squares (Paper 2's `SPAD = A X`), ridge, Bayesian ridge, polynomial regression, random forest and a Gaussian
+process - are compared on four feature sets by 10-fold cross-validation on 340 leaves; the winner is tested
+**once** on 85 held-out leaves.
+
+| Held-out test (85 leaves) | R² | Error (RMSE) |
+|---|---|---|
+| **Random forest on colour + HSV histogram** (chosen by CV) | **0.91** | **5.5 SPAD** |
+| Paper 2 baseline: least squares on mean R, G, B | 0.86 | 6.7 SPAD |
+| No model (always the average) | 0.00 | 18.0 SPAD |
+
+For scale, the meter itself varies by 3.2 SPAD between readings of the same leaf. A Gaussian process gives every
+estimate a 95% error bar (95% of held-out leaves fall inside it) and **flags photos that are not coffee
+leaves**: on a tomato leaf its error bar becomes four times wider, so the value is marked as untrustworthy.
+Very pale and very dark leaves are pulled towards the middle (few training leaves are that extreme).
+
+<p>
+  <img src="reports/figures/19_chlorophyll_spad/1_predicted_vs_measured.png" alt="Predicted vs measured SPAD on held-out coffee leaves" width="100%">
+</p>
+
+All 11 Unit 5 graphs are in [`reports/figures/`](reports/figures/) (folders `15_` to `18_`), the 3 chlorophyll
+graphs in `19_chlorophyll_spad/`, every result
 table in [`reports/tables/`](reports/tables/), and the 17-slide presentation with speaker notes in
 [`docs/Unit5_presentation.pptx`](docs/Unit5_presentation.pptx).
 
@@ -112,18 +143,20 @@ after cloning:
 python -m src.dataset        # photos -> 55 features each -> cache/features.npz   (about 1 minute)
 python -m src.classify       # grid search + 5-fold CV of the 9 classifiers -> models/   (several minutes)
 python -m src.bayes_logreg   # Bayesian logistic regression -> models/bayes_logreg.joblib
+python -m src.chlorophyll_coffee   # chlorophyll model from the ArabicaLens readings (about 1 minute)
 ```
 
 **3. Run it**
 
 | Command | What it does |
 |---|---|
-| `python demo.py` | **guided tour of the whole project in the terminal** (12 steps, Enter for the next) |
+| `python demo.py` | **guided tour of the whole project in the terminal** (13 steps, Enter for the next) |
 | `python -m src.unit5` | all of Unit 5 + its 11 graphs (about 1.5 min); `--part nn`, `combining`, `kernels` or `sampling` for one part |
 | `python -m src.predict samples/tomato_early_blight.jpg` | diagnose one photo: top-3 diseases, lesion %, why |
+| `python -m src.chlorophyll_coffee --predict data/ArabicaLens/Images/cof_26.jpg` | chlorophyll (SPAD ± error bar) of one coffee leaf |
 | `python -m src.assistant --image samples/tomato_healthy.jpg` | ask questions about a leaf or the project in the terminal |
 | `python -m src.leaf_unsupervised samples/tomato_early_blight.jpg` | PCA, k-means, GMM and HMM on the pixels of one photo |
-| `python -m pytest -q` | run the 97 automated tests |
+| `python -m pytest -q` | run the 102 automated tests |
 | `streamlit run app.py` | optional web app with the same results |
 
 ### The terminal demo
@@ -138,8 +171,8 @@ python -m src.bayes_logreg   # Bayesian logistic regression -> models/bayes_logr
 
 | Option | What it does |
 |---|---|
-| `--list` | list the 12 steps |
-| `--step 6 --step 7` | run only some steps (6-9 are Unit 5) |
+| `--list` | list the 13 steps |
+| `--step 6 --step 7` | run only some steps (6-9 are Unit 5, 10 is chlorophyll) |
 | `--no-pause` | run straight through (about 5 minutes) |
 | `--quick` | show saved results for the two slowest live runs |
 | `--open` | also open each graph in the image viewer |
@@ -165,14 +198,15 @@ plant-disease-ml/
 │   ├── leaf_unsupervised.py   Unit 3 methods on the pixels of one photo
 │   ├── unit5.py           Unit 5: MLP + backprop, AdaBoost, committees, SVM dual, GP, RVM,
 │   │                      Metropolis-Hastings, Gibbs / Ising MRF, Bayesian network
-│   ├── chlorophyll.py     SPAD regression (trains only on real meter readings)
+│   ├── chlorophyll.py     SPAD regression for your own readings (spad/spad_readings.csv)
+│   ├── chlorophyll_coffee.py  chlorophyll from a photo, trained on ArabicaLens coffee readings
 │   ├── predict.py         diagnose one photo, with an explanation
 │   ├── assistant.py       question answering (TF-IDF + nearest neighbour)
 │   ├── evaluate.py        metrics, tables, graph style
 │   └── figures.py         graphs for the earlier units (not kept in the repo)
-├── tests/                 97 pytest tests
+├── tests/                 102 pytest tests
 ├── reports/
-│   ├── figures/           the 11 Unit 5 graphs (15_ to 18_)
+│   ├── figures/           the 11 Unit 5 graphs (15_ to 18_) + 3 chlorophyll graphs (19_)
 │   └── tables/            every result as CSV and Markdown
 ├── docs/
 │   ├── Unit5_presentation.pptx   17 slides with speaker notes
@@ -183,7 +217,7 @@ plant-disease-ml/
 ├── legacy/                the original course scripts this project grew from
 │
 │   not in git (rebuilt locally)
-├── data/                  the leaf photos
+├── data/                  the leaf photos (PlantVillage_tomato/, ArabicaLens/)
 ├── cache/                 features.npz
 └── models/                trained models (.joblib)
 ```
@@ -193,8 +227,9 @@ plant-disease-ml/
 - **Lab photos only:** one leaf on a plain background. Field photos with soil, several leaves or strong shadows
   will be less accurate.
 - **5 tomato classes:** the code supports the 38-class Kaggle dataset, but that run has not been done.
-- **No chlorophyll values yet:** a SPAD model needs real chlorophyll-meter readings (`spad/spad_readings.csv`).
-  Until then only an uncalibrated greenness index is reported, never an invented SPAD number.
+- **Chlorophyll is calibrated for coffee only:** the colour → SPAD relation differs per crop. Tomato leaves
+  still get only an uncalibrated greenness index; a tomato SPAD model needs real meter readings of tomato leaves
+  (`spad/spad_readings.csv`, see `docs/spad_collection.md`, then `python -m src.chlorophyll`).
 
 ## References
 
@@ -203,5 +238,7 @@ plant-disease-ml/
 2. J. Anderson et al., "Image-based leaf SPAD value and chlorophyll measurement using a mobile phone,"
    *Precision Agriculture*, 2026. doi:10.1007/s11119-026-10386-x
 3. C. M. Bishop, *Pattern Recognition and Machine Learning*, Springer, 2006 (chapters 5-8, 11 and 14 for Unit 5).
-4. D. P. Hughes and M. Salathé, "An open access repository of images on plant health to enable the development of
+4. S. Radhakrishnan, J. Joseph and P. Kumar, "ArabicaLens: A Multimodal Dataset of High-Resolution Leaf Imagery and
+   SPAD-Based Chlorophyll Readings," Zenodo, 2026. doi:10.5281/zenodo.19447467 (CC BY 4.0)
+5. D. P. Hughes and M. Salathé, "An open access repository of images on plant health to enable the development of
    mobile disease diagnostics," arXiv:1511.08060, 2015 (the PlantVillage dataset).

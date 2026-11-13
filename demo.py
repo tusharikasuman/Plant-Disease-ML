@@ -65,7 +65,6 @@ class Tee:
         self.file.write(ANSI.sub("", text))
         return len(text)
 
-
     def flush(self):
         self.stream.flush()
         self.file.flush()
@@ -244,7 +243,7 @@ def line_chart(series: dict, title: str, xlabel: str = "", ylabel: str = "", xs=
 
 
 GRAPH_NOTES: dict[str, str] = {}
-UNIT5_TOPICS = ("nn", "combining", "kernels", "sampling")      # the only graphs kept in the project
+UNIT5_TOPICS = ("nn", "combining", "kernels", "sampling", "spad")   # the graphs kept in the project
 
 
 def graphs(topic: str, notes: dict[str, str] | None = None):
@@ -853,6 +852,61 @@ def s_sampling():
 
 
 # ----------------------------------------------------------------------------------------------------------
+@step("Chlorophyll estimation: SPAD from a leaf photo (real meter readings, coffee leaves)", "regression")
+def s_chlorophyll():
+    from src import chlorophyll_coffee as CC
+    section("What and why")
+    para("""
+    Chlorophyll tells how well a plant is fed (nitrogen) and how stressed it is. Agronomists measure it with a
+    SPAD meter clipped on the leaf. To estimate it from a PHOTO a model must learn from photos that each have a
+    real SPAD reading - the tomato disease photos have none, so for tomato the project only shows an
+    uncalibrated greenness index, never an invented SPAD number.
+
+    Here we use ArabicaLens (Zenodo 2026, CC BY 4.0): 425 coffee leaves, each photographed on a white background
+    and measured 5 times with a SPAD meter. Every photo goes through the SAME pipeline as the tomato leaves
+    (segmentation -> 55 features). Paper 2 fits a linear model b = A X from the mean R, G, B to SPAD; we compare
+    it with ridge, Bayesian ridge, polynomial regression, a random forest and a Gaussian process, on 4 feature
+    sets. 10-fold cross-validation on 80% of the leaves picks the winner; the other 20% are used ONCE as a test.
+    """)
+    formula("""
+    Paper 2      SPAD = a0 + a1 R + a2 G + a3 B             (least squares)
+    ridge        minimise ||y - X a||² + λ ||a||²           (R, G, B are collinear -> stabilise the weights)
+    GP           SPAD ~ GP(m, k)  ->  mean ± 1.96 sd        (Unit 5: an error bar for every leaf)
+    """)
+    show_code(CC.load_readings, 22)
+    if not CC.SHEET.exists():
+        print(yellow(f"    The ArabicaLens data is not in {CC.DATA_DIR.relative_to(ROOT)} - download it from "
+                     "https://zenodo.org/records/19447467 (see the README)."))
+        return
+    section("Run it on the 425 coffee leaves", green)
+    with indented():
+        r = CC.run()
+    section("Terminal chart: held-out test error (SPAD units, lower is better)")
+    t = r["test"]
+    labels = [f"best: {r['best'][1]} ({r['best'][0]})", "Paper 2: least squares on R, G, B",
+              "no model: always the average"]                  # same order as the test table in run()
+    bars(labels, t["RMSE (SPAD)"].tolist(), unit=" SPAD", digits=1, colour=yellow)
+    print(f"    (the meter itself varies by {r['meter_sd']:.1f} SPAD between readings of the same leaf)")
+    section("Estimate chlorophyll for single photos", green)
+    for photo in [CC.IMAGES / "cof_26.jpg", CC.IMAGES / "cof_252.jpg", config.SAMPLES_DIR / "tomato_healthy.jpg"]:
+        if not photo.exists():
+            continue
+        e = CC.predict(photo)
+        note = yellow("  <- not a coffee leaf: the GP is far less sure, value NOT trusted") if e["unfamiliar"] else ""
+        print(f"    {photo.name:<22} {e['spad']:5.1f} SPAD   (GP {e['gp_mean']:.1f} ± {1.96 * e['gp_sd']:.1f}){note}")
+    para("The coffee photos come with their real readings in data/ArabicaLens/coffee.xlsx (cof_26: 59.1, "
+         "cof_252: 22.6). The tomato photo shows the safety check: a Gaussian process becomes very unsure far "
+         "from its training leaves, so the estimate is flagged instead of being shown as fact.")
+    section("Graphs")
+    graphs("spad", {"1_predicted_vs_measured": "Held-out leaves: predicted vs measured SPAD (grey bars = how much "
+                                               "the meter itself varies on that leaf), and the residuals.",
+                    "2_model_comparison": "10-fold CV error of every model on every feature set.",
+                    "3_greenness_vs_spad_and_error_bars": "Left: the uncalibrated greenness index follows SPAD "
+                                                          "but bends and is not in SPAD units. Right: Gaussian "
+                                                          "process estimates with 95% error bars."})
+
+
+# ----------------------------------------------------------------------------------------------------------
 @step("Diagnose the sample leaves and ask the assistant", "the finished product")
 def s_predict():
     from src import assistant as A
@@ -885,7 +939,7 @@ def s_predict():
 
 @step("Summary: every graph, and how to run each part yourself", "wrap-up")
 def s_summary():
-    section("The graphs of the project - Unit 5 (reports/figures/)")
+    section("The graphs of the project - Unit 5 and chlorophyll (reports/figures/)")
     total = 0
     for topic, folder in config.FIG.items():
         if topic not in UNIT5_TOPICS:
@@ -903,6 +957,7 @@ def s_summary():
         ("Models", "trees, bagging, random forest, boosting, KNN, CV, metrics     → step 5"),
         ("Unit 5", "neural networks, combining models, kernel methods + sparse    → steps 6-9\n"
                    "                kernel machines, sampling methods + graphical models"),
+        ("SPAD  ", "chlorophyll regression from real meter readings (coffee)  → step 10"),
     ]:
         print(f"    {bold(unit)}  {items}")
     section("Run any part yourself")
@@ -910,6 +965,7 @@ def s_summary():
         ("streamlit run app.py", "web app: diagnose a photo, browse every result and graph"),
         ("python -m src.predict samples/tomato_early_blight.jpg", "diagnose one photo"),
         ("python -m src.unit5", "all of Unit 5 (or --part nn | combining | kernels | sampling)"),
+        ("python -m src.chlorophyll_coffee --predict PHOTO", "chlorophyll (SPAD) of one coffee leaf photo"),
         ("python -m src.assistant --image samples/tomato_healthy.jpg", "chat with Leaf Doctor in the terminal"),
         ("python -m pytest -q", "run all the tests"),
     ]:

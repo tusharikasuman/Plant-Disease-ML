@@ -1,0 +1,23 @@
+Features,# features,Model,Syllabus,CV R2,CV RMSE (SPAD),CV MAE (SPAD),Time (s)
+colour + HSV histogram,38,Random forest,Combining models: bagged trees,0.8882,5.8094,4.1405,6.3715
+colour,6,Gaussian process,Unit 5: kernel method with error bars,0.8881,5.8117,4.2619,1.5014
+all 55 features,55,Random forest,Combining models: bagged trees,0.8879,5.8186,4.1869,9.0392
+colour,6,Polynomial (degree 2) + ridge,Unit 2: linear model on non-linear basis functions,0.8854,5.8826,4.327,0.1042
+rgb (Paper 2),3,Polynomial (degree 2) + ridge,Unit 2: linear model on non-linear basis functions,0.8808,6.0003,4.3801,0.0671
+rgb (Paper 2),3,Gaussian process,Unit 5: kernel method with error bars,0.88,6.0196,4.388,1.8776
+colour,6,Random forest,Combining models: bagged trees,0.8734,6.1839,4.4725,4.3844
+colour,6,Least squares (OLS),Unit 2: b = A X (Paper 2),0.8698,6.271,4.5882,0.037
+colour,6,Ridge (lambda by CV),Unit 2: L2 penalty against collinear colours,0.8696,6.2739,4.5876,0.0685
+colour,6,Bayesian ridge,Unit 2: prior strength from the evidence,0.8685,6.3025,4.5827,0.0524
+all 55 features,55,Ridge (lambda by CV),Unit 2: L2 penalty against collinear colours,0.8671,6.3342,4.634,0.1476
+all 55 features,55,Gaussian process,Unit 5: kernel method with error bars,0.8659,6.3641,4.5397,2.1456
+rgb (Paper 2),3,Random forest,Combining models: bagged trees,0.8644,6.4,4.5728,3.9214
+colour + HSV histogram,38,Bayesian ridge,Unit 2: prior strength from the evidence,0.8643,6.4002,4.6837,0.0705
+colour + HSV histogram,38,Gaussian process,Unit 5: kernel method with error bars,0.8635,6.4197,4.5604,2.087
+colour + HSV histogram,38,Ridge (lambda by CV),Unit 2: L2 penalty against collinear colours,0.8626,6.442,4.7178,0.0966
+rgb (Paper 2),3,Least squares (OLS),Unit 2: b = A X (Paper 2),0.8622,6.4497,4.6679,0.0388
+rgb (Paper 2),3,Ridge (lambda by CV),Unit 2: L2 penalty against collinear colours,0.8622,6.45,4.6715,0.0668
+rgb (Paper 2),3,Bayesian ridge,Unit 2: prior strength from the evidence,0.8622,6.4501,4.6698,0.0488
+all 55 features,55,Bayesian ridge,Unit 2: prior strength from the evidence,0.8413,6.9234,4.7643,0.0889
+colour + HSV histogram,38,Least squares (OLS),Unit 2: b = A X (Paper 2),0.8312,7.1401,4.8873,0.0639
+all 55 features,55,Least squares (OLS),Unit 2: b = A X (Paper 2),0.5372,11.8212,5.427,0.0659

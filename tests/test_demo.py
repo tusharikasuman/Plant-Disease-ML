@@ -18,7 +18,7 @@ def test_demo_lists_every_step():
 
 
 def test_demo_runs_the_quick_steps():
-    out = run_demo("--step", "0", "--step", "1", "--step", "11")
+    out = run_demo("--step", "0", "--step", "1", "--step", "12")
     assert out.returncode == 0, out.stderr
     assert "Traceback" not in out.stdout + out.stderr
     assert "55 features" in out.stdout and "lesion fraction" in out.stdout
