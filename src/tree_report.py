@@ -65,6 +65,35 @@ def leaf_rules(tree: DecisionTreeClassifier, feature_names: list[str], classes: 
     return out
 
 
+TREE_MODEL_PATH = config.MODELS_DIR / "decision_tree.joblib"
+
+
+def node_table(tree: DecisionTreeClassifier, feature_names: list[str], classes: list[str], Xv, yv) -> pd.DataFrame:
+    """One row per node: parent, yes/no branch, depth, question, training-class counts, held-out leaves reaching it."""
+    t = tree.tree_
+    passed = tree.decision_path(Xv).toarray().astype(bool)          # (test leaves, nodes)
+    pred = tree.predict(Xv)
+    parent, branch, depth = {0: -1}, {0: ""}, {0: 0}
+    for i in range(t.node_count):
+        for child, b in ((t.children_left[i], "yes"), (t.children_right[i], "no")):
+            if child != -1:
+                parent[child], branch[child], depth[child] = i, b, depth[i] + 1
+    rows = []
+    for i in range(t.node_count):
+        v = t.value[i][0]
+        cnt = np.rint(v * t.n_node_samples[i] if v.sum() <= 1.0001 else v).astype(int)
+        leaf = t.children_left[i] == -1
+        p = passed[:, i]
+        rows.append({"node": i, "parent": parent[i], "branch": branch[i], "depth": depth[i], "is_leaf": int(leaf),
+                     "feature": "" if leaf else feature_names[t.feature[i]],
+                     "threshold": np.nan if leaf else round(float(t.threshold[i]), 5),
+                     "train_leaves": int(t.n_node_samples[i]), "predicts": classes[int(np.argmax(cnt))],
+                     "purity_pct": round(100 * cnt.max() / cnt.sum(), 1), "test_leaves": int(p.sum()),
+                     "test_correct": int((pred[p] == yv[p]).sum()) if leaf else np.nan,
+                     **{f"n_{c}": int(n) for c, n in zip(classes, cnt)}})
+    return pd.DataFrame(rows)
+
+
 def run(data: dict, out_dir: Path, show_depth: int = 0) -> dict:
     config.set_seeds()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -104,6 +133,13 @@ def run(data: dict, out_dir: Path, show_depth: int = 0) -> dict:
     cm_df = pd.DataFrame(cm, index=[f"true {c}" for c in classes], columns=[f"pred {c}" for c in classes])
     rep = classification_report(yv, pred, target_names=classes, digits=3)
     (out_dir / "classification_report.txt").write_text(f"{header}{rep}\nConfusion matrix (rows = true class):\n{cm_df.to_string()}\n", encoding="utf-8")
+
+    # 4b. every node (for the app's tree drawing) + the fitted tree itself (to trace any photo through it)
+    node_table(tree, names, classes, Xv, yv).to_csv(out_dir / "tree_nodes.csv", index=False)
+    import joblib
+    config.MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    joblib.dump({"tree": tree, "feature_names": names, "classes": classes, "feature_version": config.FEATURE_VERSION,
+                 "accuracy": acc}, TREE_MODEL_PATH, compress=3)
 
     # 5. feature importance
     imp = pd.DataFrame({"feature": names, "importance_%": np.round(100 * tree.feature_importances_, 2)}).sort_values("importance_%", ascending=False)

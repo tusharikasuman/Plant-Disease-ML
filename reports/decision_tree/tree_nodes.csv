@@ -1,0 +1,682 @@
+node,parent,branch,depth,is_leaf,feature,threshold,train_leaves,predicts,purity_pct,test_leaves,test_correct,n_Early blight,n_Late blight,n_Septoria leaf spot,n_Yellow leaf curl virus,n_Healthy
+0,-1,,0,0,ExG (normalised),0.30793,9302,Yellow leaf curl virus,46.1,2326,,800,1527,1417,4285,1273
+1,0,yes,1,0,HSV h0 s0 v1,0.00061,4830,Late blight,26.2,1233,,682,1266,1010,611,1261
+2,1,yes,2,0,R mean,80.58989,1826,Healthy,62.7,470,,147,244,132,159,1144
+3,2,yes,3,0,HSV h3 s0 v0,0.13919,393,Early blight,36.1,107,,142,69,48,117,17
+4,3,yes,4,0,R std,26.35068,238,Yellow leaf curl virus,42.0,65,,23,56,42,100,17
+5,4,yes,5,0,HSV h7 s0 v0,0.0019,122,Late blight,34.4,31,,17,42,34,15,14
+6,5,yes,6,0,HSV h1 s0 v0,0.01896,108,Late blight,38.9,27,,3,42,34,15,14
+7,6,yes,7,0,HSV h2 s0 v1,0.08674,16,Healthy,87.5,3,,0,0,2,0,14
+8,7,yes,8,1,,,14,Healthy,100.0,2,2.0,0,0,0,0,14
+9,7,no,8,1,,,2,Septoria leaf spot,100.0,1,1.0,0,0,2,0,0
+10,6,no,7,0,GLCM correlation,0.84679,92,Late blight,45.7,24,,3,42,32,15,0
+11,10,yes,8,0,HSV h0 s0 v0,0.0348,25,Septoria leaf spot,84.0,8,,1,2,21,1,0
+12,11,yes,9,0,GLCM ASM,0.02059,23,Septoria leaf spot,91.3,8,,1,0,21,1,0
+13,12,yes,10,1,,,2,Early blight,50.0,0,0.0,1,0,0,1,0
+14,12,no,10,1,,,21,Septoria leaf spot,100.0,8,6.0,0,0,21,0,0
+15,11,no,9,1,,,2,Late blight,100.0,0,0.0,0,2,0,0,0
+16,10,no,8,0,HSV h3 s0 v0,0.04121,67,Late blight,59.7,16,,2,40,11,14,0
+17,16,yes,9,0,GLCM contrast,2.18187,44,Late blight,81.8,11,,0,36,4,4,0
+18,17,yes,10,1,,,40,Late blight,90.0,9,6.0,0,36,1,3,0
+19,17,no,10,1,,,4,Septoria leaf spot,75.0,2,0.0,0,0,3,1,0
+20,16,no,9,0,HSV h0 s0 v1,0.00013,23,Yellow leaf curl virus,43.5,5,,2,4,7,10,0
+21,20,yes,10,1,,,17,Yellow leaf curl virus,58.8,3,1.0,2,4,1,10,0
+22,20,no,10,1,,,6,Septoria leaf spot,100.0,2,1.0,0,0,6,0,0
+23,5,no,6,1,,,14,Early blight,100.0,4,3.0,14,0,0,0,0
+24,4,no,5,0,HSV h1 s0 v0,0.2379,116,Yellow leaf curl virus,73.3,34,,6,14,8,85,3
+25,24,yes,6,0,B mean,62.06196,108,Yellow leaf curl virus,78.7,28,,6,6,8,85,3
+26,25,yes,7,0,B std,33.86415,89,Yellow leaf curl virus,92.1,24,,3,1,1,82,2
+27,26,yes,8,0,HSV h3 s1 v0,0.04188,84,Yellow leaf curl virus,97.6,24,,1,0,1,82,0
+28,27,yes,9,0,Hu moment 2,1.90583,83,Yellow leaf curl virus,98.8,24,,0,0,1,82,0
+29,28,yes,10,1,,,3,Yellow leaf curl virus,66.7,6,3.0,0,0,1,2,0
+30,28,no,10,1,,,80,Yellow leaf curl virus,100.0,18,16.0,0,0,0,80,0
+31,27,no,9,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+32,26,no,8,0,GLCM homogeneity,0.54485,5,Early blight,40.0,0,,2,1,0,0,2
+33,32,yes,9,1,,,2,Healthy,100.0,0,0.0,0,0,0,0,2
+34,32,no,9,0,HSV h1 s0 v0,0.14874,3,Early blight,66.7,0,,2,1,0,0,0
+35,34,yes,10,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+36,34,no,10,1,,,2,Early blight,100.0,0,0.0,2,0,0,0,0
+37,25,no,7,0,HSV h3 s0 v0,0.03532,19,Septoria leaf spot,36.8,4,,3,5,7,3,1
+38,37,yes,8,0,B mean,69.36625,8,Late blight,62.5,2,,2,5,0,0,1
+39,38,yes,9,0,HSV h7 s0 v1,0.00019,6,Late blight,83.3,0,,0,5,0,0,1
+40,39,yes,10,1,,,5,Late blight,100.0,0,0.0,0,5,0,0,0
+41,39,no,10,1,,,1,Healthy,100.0,0,0.0,0,0,0,0,1
+42,38,no,9,1,,,2,Early blight,100.0,2,0.0,2,0,0,0,0
+43,37,no,8,0,Hu moment 2,2.63416,11,Septoria leaf spot,63.6,2,,1,0,7,3,0
+44,43,yes,9,1,,,7,Septoria leaf spot,100.0,2,2.0,0,0,7,0,0
+45,43,no,9,0,HSV h3 s1 v0,0.00267,4,Yellow leaf curl virus,75.0,0,,1,0,0,3,0
+46,45,yes,10,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+47,45,no,10,1,,,3,Yellow leaf curl virus,100.0,0,0.0,0,0,0,3,0
+48,24,no,6,1,,,8,Late blight,100.0,6,4.0,0,8,0,0,0
+49,3,no,4,0,HSV h0 s0 v0,0.00845,155,Early blight,76.8,42,,119,13,6,17,0
+50,49,yes,5,0,B mean,59.7908,30,Yellow leaf curl virus,46.7,15,,3,8,5,14,0
+51,50,yes,6,0,GLI,0.17609,15,Yellow leaf curl virus,86.7,11,,0,1,1,13,0
+52,51,yes,7,0,G/R ratio,1.33882,2,Late blight,50.0,3,,0,1,1,0,0
+53,52,yes,8,1,,,1,Septoria leaf spot,100.0,2,1.0,0,0,1,0,0
+54,52,no,8,1,,,1,Late blight,100.0,1,0.0,0,1,0,0,0
+55,51,no,7,1,,,13,Yellow leaf curl virus,100.0,8,6.0,0,0,0,13,0
+56,50,no,6,0,Hu moment 5,7.59583,15,Late blight,46.7,4,,3,7,4,1,0
+57,56,yes,7,0,R mean,63.79992,8,Septoria leaf spot,50.0,3,,3,1,4,0,0
+58,57,yes,8,0,HSV h0 s1 v0,2e-05,4,Early blight,75.0,1,,3,1,0,0,0
+59,58,yes,9,1,,,3,Early blight,100.0,0,0.0,3,0,0,0,0
+60,58,no,9,1,,,1,Late blight,100.0,1,0.0,0,1,0,0,0
+61,57,no,8,1,,,4,Septoria leaf spot,100.0,2,0.0,0,0,4,0,0
+62,56,no,7,0,G mean,81.65686,7,Late blight,85.7,1,,0,6,0,1,0
+63,62,yes,8,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+64,62,no,8,1,,,6,Late blight,100.0,1,0.0,0,6,0,0,0
+65,49,no,5,0,HSV h1 s0 v0,0.1262,125,Early blight,92.8,27,,116,5,1,3,0
+66,65,yes,6,0,GLI,0.20804,109,Early blight,97.2,26,,106,0,0,3,0
+67,66,yes,7,0,HSV h3 s0 v1,0.00013,108,Early blight,98.1,26,,106,0,0,2,0
+68,67,yes,8,0,GLCM dissimilarity,0.70847,3,Early blight,66.7,2,,2,0,0,1,0
+69,68,yes,9,1,,,2,Early blight,100.0,0,0.0,2,0,0,0,0
+70,68,no,9,1,,,1,Yellow leaf curl virus,100.0,2,1.0,0,0,0,1,0
+71,67,no,8,0,HSV h2 s0 v1,0.03357,105,Early blight,99.0,24,,104,0,0,1,0
+72,71,yes,9,1,,,92,Early blight,100.0,21,19.0,92,0,0,0,0
+73,71,no,9,0,GLCM energy,0.17584,13,Early blight,92.3,3,,12,0,0,1,0
+74,73,yes,10,1,,,12,Early blight,100.0,3,3.0,12,0,0,0,0
+75,73,no,10,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+76,66,no,7,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+77,65,no,6,0,HSV h7 s0 v0,0.00068,16,Early blight,62.5,1,,10,5,1,0,0
+78,77,yes,7,0,B std,19.85142,7,Late blight,71.4,1,,1,5,1,0,0
+79,78,yes,8,0,HSV h1 s1 v0,0.03622,2,Early blight,50.0,0,,1,0,1,0,0
+80,79,yes,9,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+81,79,no,9,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+82,78,no,8,1,,,5,Late blight,100.0,1,0.0,0,5,0,0,0
+83,77,no,7,1,,,9,Early blight,100.0,0,0.0,9,0,0,0,0
+84,2,no,3,0,HSV h1 s1 v1,0.01088,1433,Healthy,78.6,363,,5,175,84,42,1127
+85,84,yes,4,0,GLCM correlation,0.93048,1255,Healthy,89.2,304,,5,73,57,1,1119
+86,85,yes,5,0,HSV h3 s1 v0,6e-05,1214,Healthy,92.1,291,,4,37,55,0,1118
+87,86,yes,6,0,HSV h3 s0 v0,0.04038,1166,Healthy,95.2,280,,2,24,30,0,1110
+88,87,yes,7,0,Hu moment 2,1.74722,1156,Healthy,95.8,278,,2,24,22,0,1108
+89,88,yes,8,0,HSV h0 s0 v1,5e-05,10,Late blight,40.0,1,,0,4,4,0,2
+90,89,yes,9,0,Hu moment 1,0.58043,6,Late blight,66.7,0,,0,4,0,0,2
+91,90,yes,10,1,,,4,Late blight,100.0,0,0.0,0,4,0,0,0
+92,90,no,10,1,,,2,Healthy,100.0,0,0.0,0,0,0,0,2
+93,89,no,9,1,,,4,Septoria leaf spot,100.0,1,0.0,0,0,4,0,0
+94,88,no,8,0,HSV h2 s1 v1,0.00025,1146,Healthy,96.5,277,,2,20,18,0,1106
+95,94,yes,9,0,Hu moment 1,0.73394,1019,Healthy,98.3,245,,1,6,10,0,1002
+96,95,yes,10,1,,,164,Healthy,91.5,39,37.0,1,6,7,0,150
+97,95,no,10,1,,,855,Healthy,99.6,206,200.0,0,0,3,0,852
+98,94,no,9,0,HSV h1 s0 v1,0.14779,127,Healthy,81.9,32,,1,14,8,0,104
+99,98,yes,10,1,,,114,Healthy,90.4,26,21.0,1,2,8,0,103
+100,98,no,10,1,,,13,Late blight,92.3,6,4.0,0,12,0,0,1
+101,87,no,7,0,HSV h4 s0 v0,0.00359,10,Septoria leaf spot,80.0,2,,0,0,8,0,2
+102,101,yes,8,1,,,8,Septoria leaf spot,100.0,0,0.0,0,0,8,0,0
+103,101,no,8,1,,,2,Healthy,100.0,2,2.0,0,0,0,0,2
+104,86,no,6,0,G/R ratio,1.21318,48,Septoria leaf spot,52.1,11,,2,13,25,0,8
+105,104,yes,7,1,,,7,Healthy,100.0,2,1.0,0,0,0,0,7
+106,104,no,7,0,HSV h4 s0 v0,8e-05,41,Septoria leaf spot,61.0,9,,2,13,25,0,1
+107,106,yes,8,0,B mean,76.09633,10,Late blight,90.0,2,,1,9,0,0,0
+108,107,yes,9,1,,,1,Early blight,100.0,2,0.0,1,0,0,0,0
+109,107,no,9,1,,,9,Late blight,100.0,0,0.0,0,9,0,0,0
+110,106,no,8,0,GLCM correlation,0.90783,31,Septoria leaf spot,80.6,7,,1,4,25,0,1
+111,110,yes,9,0,GLI,0.19759,27,Septoria leaf spot,92.6,6,,0,1,25,0,1
+112,111,yes,10,1,,,25,Septoria leaf spot,100.0,5,4.0,0,0,25,0,0
+113,111,no,10,1,,,2,Late blight,50.0,1,1.0,0,1,0,0,1
+114,110,no,9,0,GLCM contrast,3.58417,4,Late blight,75.0,1,,1,3,0,0,0
+115,114,yes,10,1,,,3,Late blight,100.0,1,0.0,0,3,0,0,0
+116,114,no,10,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+117,85,no,5,0,Hu moment 1,0.77246,41,Late blight,87.8,13,,1,36,2,1,1
+118,117,yes,6,0,R mean,82.93445,38,Late blight,94.7,13,,0,36,2,0,0
+119,118,yes,7,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+120,118,no,7,0,HSV h2 s0 v1,0.79616,37,Late blight,97.3,13,,0,36,1,0,0
+121,120,yes,8,1,,,36,Late blight,100.0,13,11.0,0,36,0,0,0
+122,120,no,8,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+123,117,no,6,0,Hu moment 3,3.37442,3,Early blight,33.3,0,,1,0,0,1,1
+124,123,yes,7,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+125,123,no,7,0,GLCM contrast,3.83118,2,Yellow leaf curl virus,50.0,0,,0,0,0,1,1
+126,125,yes,8,1,,,1,Healthy,100.0,0,0.0,0,0,0,0,1
+127,125,no,8,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+128,84,no,4,0,GLCM homogeneity,0.75268,178,Late blight,57.3,59,,0,102,27,41,8
+129,128,yes,5,0,GLCM homogeneity,0.55592,154,Late blight,65.6,53,,0,101,27,18,8
+130,129,yes,6,0,HSV h3 s0 v0,0.00115,16,Septoria leaf spot,56.2,6,,0,0,9,2,5
+131,130,yes,7,1,,,5,Healthy,100.0,3,3.0,0,0,0,0,5
+132,130,no,7,0,HSV h2 s1 v0,0.15592,11,Septoria leaf spot,81.8,3,,0,0,9,2,0
+133,132,yes,8,1,,,9,Septoria leaf spot,100.0,2,1.0,0,0,9,0,0
+134,132,no,8,1,,,2,Yellow leaf curl virus,100.0,1,1.0,0,0,0,2,0
+135,129,no,6,0,R mean,143.44264,138,Late blight,73.2,47,,0,101,18,16,3
+136,135,yes,7,0,HSV h0 s1 v0,0.00214,131,Late blight,77.1,43,,0,101,18,9,3
+137,136,yes,8,0,HSV h2 s0 v1,0.00225,122,Late blight,81.1,38,,0,99,11,9,3
+138,137,yes,9,1,,,4,Yellow leaf curl virus,100.0,1,1.0,0,0,0,4,0
+139,137,no,9,0,HSV h1 s0 v0,0.03119,118,Late blight,83.9,37,,0,99,11,5,3
+140,139,yes,10,1,,,14,Septoria leaf spot,42.9,5,0.0,0,5,6,0,3
+141,139,no,10,1,,,104,Late blight,90.4,32,31.0,0,94,5,5,0
+142,136,no,8,0,GLCM energy,0.143,9,Septoria leaf spot,77.8,5,,0,2,7,0,0
+143,142,yes,9,1,,,2,Late blight,100.0,0,0.0,0,2,0,0,0
+144,142,no,9,1,,,7,Septoria leaf spot,100.0,5,5.0,0,0,7,0,0
+145,135,no,7,1,,,7,Yellow leaf curl virus,100.0,4,4.0,0,0,0,7,0
+146,128,no,5,0,HSV h4 s0 v1,0.0001,24,Yellow leaf curl virus,95.8,6,,0,1,0,23,0
+147,146,yes,6,1,,,23,Yellow leaf curl virus,100.0,5,5.0,0,0,0,23,0
+148,146,no,6,1,,,1,Late blight,100.0,1,0.0,0,1,0,0,0
+149,1,no,2,0,G mean,113.3462,3004,Late blight,34.0,763,,535,1022,878,452,117
+150,149,yes,3,0,HSV h1 s1 v0,0.17503,1656,Late blight,29.5,420,,458,489,209,434,66
+151,150,yes,4,0,HSV h0 s0 v1,0.01254,999,Late blight,36.6,252,,357,366,129,92,55
+152,151,yes,5,0,GLCM contrast,5.61888,596,Early blight,40.3,155,,240,108,120,73,55
+153,152,yes,6,0,HSV h3 s0 v1,0.0021,541,Early blight,43.8,140,,237,107,117,73,7
+154,153,yes,7,0,HSV h1 s1 v1,0.00022,336,Early blight,26.8,90,,90,83,88,68,7
+155,154,yes,8,0,Lesion fraction,0.04258,110,Late blight,57.3,34,,20,63,13,11,3
+156,155,yes,9,0,GLCM dissimilarity,1.09351,45,Early blight,37.8,15,,17,12,12,1,3
+157,156,yes,10,1,,,24,Late blight,45.8,8,3.0,3,11,10,0,0
+158,156,no,10,1,,,21,Early blight,66.7,7,3.0,14,1,2,1,3
+159,155,no,9,0,HSV h3 s1 v0,0.00108,65,Late blight,78.5,19,,3,51,1,10,0
+160,159,yes,10,1,,,54,Late blight,88.9,14,9.0,2,48,0,4,0
+161,159,no,10,1,,,11,Yellow leaf curl virus,54.5,5,1.0,1,3,1,6,0
+162,154,no,8,0,HSV h2 s1 v0,0.09936,226,Septoria leaf spot,33.2,56,,70,20,75,57,4
+163,162,yes,9,0,GLCM correlation,0.88986,145,Septoria leaf spot,46.2,36,,50,13,67,11,4
+164,163,yes,10,1,,,91,Septoria leaf spot,64.8,23,15.0,22,3,59,5,2
+165,163,no,10,1,,,54,Early blight,51.9,13,5.0,28,10,8,6,2
+166,162,no,9,0,HSV h3 s0 v0,0.0008,81,Yellow leaf curl virus,56.8,20,,20,7,8,46,0
+167,166,yes,10,1,,,27,Early blight,44.4,8,2.0,12,4,5,6,0
+168,166,no,10,1,,,54,Yellow leaf curl virus,74.1,12,9.0,8,3,3,40,0
+169,153,no,7,0,G mean,104.37122,205,Early blight,71.7,50,,147,24,29,5,0
+170,169,yes,8,0,Hu moment 2,2.18504,162,Early blight,81.5,41,,132,20,6,4,0
+171,170,yes,9,0,HSV h2 s0 v0,0.41576,35,Early blight,42.9,11,,15,15,4,1,0
+172,171,yes,10,1,,,17,Early blight,64.7,10,10.0,11,2,3,1,0
+173,171,no,10,1,,,18,Late blight,72.2,1,0.0,4,13,1,0,0
+174,170,no,9,0,GLI,0.2066,127,Early blight,92.1,30,,117,5,2,3,0
+175,174,yes,10,1,,,125,Early blight,93.6,30,29.0,117,4,1,3,0
+176,174,no,10,1,,,2,Late blight,50.0,0,0.0,0,1,1,0,0
+177,169,no,8,0,B mean,82.81342,43,Septoria leaf spot,53.5,9,,15,4,23,1,0
+178,177,yes,9,0,HSV h3 s1 v0,0.00017,32,Septoria leaf spot,71.9,6,,4,4,23,1,0
+179,178,yes,10,1,,,14,Septoria leaf spot,35.7,2,0.0,4,4,5,1,0
+180,178,no,10,1,,,18,Septoria leaf spot,100.0,4,3.0,0,0,18,0,0
+181,177,no,9,1,,,11,Early blight,100.0,3,1.0,11,0,0,0,0
+182,152,no,6,0,G/R ratio,1.17362,55,Healthy,87.3,15,,3,1,3,0,48
+183,182,yes,7,1,,,48,Healthy,100.0,13,13.0,0,0,0,0,48
+184,182,no,7,0,HSV h4 s0 v1,9e-05,7,Early blight,42.9,2,,3,1,3,0,0
+185,184,yes,8,0,HSV h1 s0 v0,0.08639,4,Early blight,75.0,1,,3,1,0,0,0
+186,185,yes,9,1,,,3,Early blight,100.0,0,0.0,3,0,0,0,0
+187,185,no,9,1,,,1,Late blight,100.0,1,0.0,0,1,0,0,0
+188,184,no,8,1,,,3,Septoria leaf spot,100.0,1,1.0,0,0,3,0,0
+189,151,no,5,0,HSV h3 s0 v1,0.00154,403,Late blight,64.0,97,,117,258,9,19,0
+190,189,yes,6,0,HSV h1 s1 v1,0.00089,293,Late blight,73.7,78,,50,216,8,19,0
+191,190,yes,7,0,HSV h7 s0 v1,0.00105,114,Late blight,91.2,34,,4,104,4,2,0
+192,191,yes,8,0,HSV h2 s0 v0,0.67967,109,Late blight,95.4,34,,3,104,0,2,0
+193,192,yes,9,0,Hu moment 5,-9.09269,108,Late blight,96.3,34,,3,104,0,1,0
+194,193,yes,10,1,,,6,Late blight,66.7,8,8.0,1,4,0,1,0
+195,193,no,10,1,,,102,Late blight,98.0,26,23.0,2,100,0,0,0
+196,192,no,9,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+197,191,no,8,0,HSV h0 s0 v0,0.17455,5,Septoria leaf spot,80.0,0,,1,0,4,0,0
+198,197,yes,9,1,,,4,Septoria leaf spot,100.0,0,0.0,0,0,4,0,0
+199,197,no,9,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+200,190,no,7,0,HSV h2 s0 v0,0.02919,179,Late blight,62.6,44,,46,112,4,17,0
+201,200,yes,8,0,Hu moment 3,3.69974,44,Late blight,93.2,12,,2,41,1,0,0
+202,201,yes,9,1,,,38,Late blight,100.0,10,7.0,0,38,0,0,0
+203,201,no,9,0,Hu moment 7,-8.6142,6,Late blight,50.0,2,,2,3,1,0,0
+204,203,yes,10,1,,,3,Early blight,66.7,1,0.0,2,0,1,0,0
+205,203,no,10,1,,,3,Late blight,100.0,1,0.0,0,3,0,0,0
+206,200,no,8,0,HSV h4 s0 v0,0.0002,135,Late blight,52.6,32,,44,71,3,17,0
+207,206,yes,9,0,HSV h0 s1 v1,1e-05,86,Early blight,41.9,20,,36,33,2,15,0
+208,207,yes,10,1,,,25,Yellow leaf curl virus,52.0,6,1.0,4,8,0,13,0
+209,207,no,10,1,,,61,Early blight,52.5,14,9.0,32,25,2,2,0
+210,206,no,9,0,HSV h1 s1 v1,0.02109,49,Late blight,77.6,12,,8,38,1,2,0
+211,210,yes,10,1,,,41,Late blight,85.4,10,7.0,3,35,1,2,0
+212,210,no,10,1,,,8,Early blight,62.5,2,1.0,5,3,0,0,0
+213,189,no,6,0,HSV h1 s1 v1,0.00068,110,Early blight,60.9,19,,67,42,1,0,0
+214,213,yes,7,0,HSV h3 s0 v1,0.01213,45,Late blight,73.3,4,,12,33,0,0,0
+215,214,yes,8,1,,,23,Late blight,100.0,3,3.0,0,23,0,0,0
+216,214,no,8,0,Hu moment 7,6.76138,22,Early blight,54.5,1,,12,10,0,0,0
+217,216,yes,9,0,HSV h1 s0 v0,0.19887,12,Early blight,83.3,0,,10,2,0,0,0
+218,217,yes,10,1,,,10,Early blight,100.0,0,0.0,10,0,0,0,0
+219,217,no,10,1,,,2,Late blight,100.0,0,0.0,0,2,0,0,0
+220,216,no,9,0,HSV h1 s0 v1,0.0727,10,Late blight,80.0,1,,2,8,0,0,0
+221,220,yes,10,1,,,8,Late blight,100.0,0,0.0,0,8,0,0,0
+222,220,no,10,1,,,2,Early blight,100.0,1,0.0,2,0,0,0,0
+223,213,no,7,0,HSV h4 s0 v1,0.00099,65,Early blight,84.6,15,,55,9,1,0,0
+224,223,yes,8,0,R std,50.28272,61,Early blight,90.2,13,,55,5,1,0,0
+225,224,yes,9,0,HSV h1 s0 v1,0.01711,59,Early blight,93.2,13,,55,4,0,0,0
+226,225,yes,10,1,,,3,Late blight,66.7,0,0.0,1,2,0,0,0
+227,225,no,10,1,,,56,Early blight,96.4,13,11.0,54,2,0,0,0
+228,224,no,9,0,HSV h6 s0 v1,0.0003,2,Late blight,50.0,0,,0,1,1,0,0
+229,228,yes,10,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+230,228,no,10,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+231,223,no,8,1,,,4,Late blight,100.0,2,1.0,0,4,0,0,0
+232,150,no,4,0,HSV h6 s0 v0,3e-05,657,Yellow leaf curl virus,52.1,168,,101,123,80,342,11
+233,232,yes,5,0,HSV h1 s0 v0,0.16446,394,Yellow leaf curl virus,73.6,104,,18,53,28,290,5
+234,233,yes,6,0,HSV h2 s0 v0,0.0012,306,Yellow leaf curl virus,85.6,77,,10,25,8,262,1
+235,234,yes,7,0,HSV h1 s1 v1,0.12746,11,Late blight,81.8,3,,0,9,2,0,0
+236,235,yes,8,1,,,9,Late blight,100.0,2,2.0,0,9,0,0,0
+237,235,no,8,1,,,2,Septoria leaf spot,100.0,1,1.0,0,0,2,0,0
+238,234,no,7,0,HSV h1 s0 v1,0.1806,295,Yellow leaf curl virus,88.8,74,,10,16,6,262,1
+239,238,yes,8,0,B std,21.40808,286,Yellow leaf curl virus,91.3,72,,10,9,6,261,0
+240,239,yes,9,0,GLCM homogeneity,0.573,5,Septoria leaf spot,80.0,3,,1,0,4,0,0
+241,240,yes,10,1,,,4,Septoria leaf spot,100.0,1,1.0,0,0,4,0,0
+242,240,no,10,1,,,1,Early blight,100.0,2,0.0,1,0,0,0,0
+243,239,no,9,0,HSV h2 s0 v1,0.06767,281,Yellow leaf curl virus,92.9,69,,9,9,2,261,0
+244,243,yes,10,1,,,268,Yellow leaf curl virus,95.1,67,58.0,8,4,1,255,0
+245,243,no,10,1,,,13,Yellow leaf curl virus,46.2,2,2.0,1,5,1,6,0
+246,238,no,8,0,HSV h7 s0 v0,3e-05,9,Late blight,77.8,2,,0,7,0,1,1
+247,246,yes,9,0,Hu moment 6,4.46653,2,Yellow leaf curl virus,50.0,0,,0,0,0,1,1
+248,247,yes,10,1,,,1,Healthy,100.0,0,0.0,0,0,0,0,1
+249,247,no,10,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+250,246,no,9,1,,,7,Late blight,100.0,2,0.0,0,7,0,0,0
+251,233,no,6,0,HSV h3 s0 v0,0.00072,88,Late blight,31.8,27,,8,28,20,28,4
+252,251,yes,7,0,Lesion fraction,0.11511,56,Late blight,48.2,25,,6,27,13,6,4
+253,252,yes,8,0,B std,25.60517,30,Septoria leaf spot,43.3,20,,3,6,13,4,4
+254,253,yes,9,0,GLCM homogeneity,0.59882,16,Septoria leaf spot,81.2,9,,0,3,13,0,0
+255,254,yes,10,1,,,13,Septoria leaf spot,100.0,8,6.0,0,0,13,0,0
+256,254,no,10,1,,,3,Late blight,100.0,1,0.0,0,3,0,0,0
+257,253,no,9,0,GLCM contrast,4.5894,14,Yellow leaf curl virus,28.6,11,,3,3,0,4,4
+258,257,yes,10,1,,,10,Yellow leaf curl virus,40.0,8,6.0,3,3,0,4,0
+259,257,no,10,1,,,4,Healthy,100.0,3,2.0,0,0,0,0,4
+260,252,no,8,0,HSV h1 s1 v1,0.04728,26,Late blight,80.8,5,,3,21,0,2,0
+261,260,yes,9,0,G std,24.66035,23,Late blight,91.3,3,,1,21,0,1,0
+262,261,yes,10,1,,,2,Early blight,50.0,0,0.0,1,0,0,1,0
+263,261,no,10,1,,,21,Late blight,100.0,3,3.0,0,21,0,0,0
+264,260,no,9,0,HSV h0 s1 v0,0.06595,3,Early blight,66.7,2,,2,0,0,1,0
+265,264,yes,10,1,,,2,Early blight,100.0,1,0.0,2,0,0,0,0
+266,264,no,10,1,,,1,Yellow leaf curl virus,100.0,1,0.0,0,0,0,1,0
+267,251,no,7,0,G mean,85.22383,32,Yellow leaf curl virus,68.8,2,,2,1,7,22,0
+268,267,yes,8,0,GLCM energy,0.15587,23,Yellow leaf curl virus,87.0,2,,2,0,1,20,0
+269,268,yes,9,0,HSV h1 s1 v0,0.36784,21,Yellow leaf curl virus,95.2,2,,0,0,1,20,0
+270,269,yes,10,1,,,20,Yellow leaf curl virus,100.0,2,2.0,0,0,0,20,0
+271,269,no,10,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+272,268,no,9,1,,,2,Early blight,100.0,0,0.0,2,0,0,0,0
+273,267,no,8,0,HSV h2 s0 v1,0.01035,9,Septoria leaf spot,66.7,0,,0,1,6,2,0
+274,273,yes,9,1,,,6,Septoria leaf spot,100.0,0,0.0,0,0,6,0,0
+275,273,no,9,0,HSV h1 s1 v1,0.01498,3,Yellow leaf curl virus,66.7,0,,0,1,0,2,0
+276,275,yes,10,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+277,275,no,10,1,,,2,Yellow leaf curl virus,100.0,0,0.0,0,0,0,2,0
+278,232,no,5,0,HSV h0 s0 v1,0.02729,263,Early blight,31.6,64,,83,70,52,52,6
+279,278,yes,6,0,GLCM dissimilarity,1.04757,179,Early blight,37.4,42,,67,16,49,41,6
+280,279,yes,7,0,HSV h0 s0 v0,0.04151,64,Early blight,73.4,15,,47,6,3,8,0
+281,280,yes,8,0,HSV h6 s1 v0,8e-05,4,Septoria leaf spot,75.0,2,,0,1,3,0,0
+282,281,yes,9,1,,,3,Septoria leaf spot,100.0,2,0.0,0,0,3,0,0
+283,281,no,9,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+284,280,no,8,0,R std,30.02517,60,Early blight,78.3,13,,47,5,0,8,0
+285,284,yes,9,0,G mean,59.67278,35,Early blight,94.3,8,,33,2,0,0,0
+286,285,yes,10,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+287,285,no,10,1,,,34,Early blight,97.1,8,6.0,33,1,0,0,0
+288,284,no,9,0,HSV h2 s0 v0,0.15903,25,Early blight,56.0,5,,14,3,0,8,0
+289,288,yes,10,1,,,17,Early blight,76.5,4,3.0,13,3,0,1,0
+290,288,no,10,1,,,8,Yellow leaf curl virus,87.5,1,1.0,1,0,0,7,0
+291,279,no,7,0,B std,26.36378,115,Septoria leaf spot,40.0,27,,20,10,46,33,6
+292,291,yes,8,0,GLCM contrast,2.57914,55,Septoria leaf spot,72.7,13,,6,5,40,4,0
+293,292,yes,9,0,HSV h2 s1 v0,0.08822,13,Early blight,38.5,4,,5,1,3,4,0
+294,293,yes,10,1,,,9,Early blight,55.6,1,1.0,5,1,3,0,0
+295,293,no,10,1,,,4,Yellow leaf curl virus,100.0,3,2.0,0,0,0,4,0
+296,292,no,9,0,HSV h1 s1 v1,0.00498,42,Septoria leaf spot,88.1,9,,1,4,37,0,0
+297,296,yes,10,1,,,3,Late blight,100.0,2,0.0,0,3,0,0,0
+298,296,no,10,1,,,39,Septoria leaf spot,94.9,7,5.0,1,1,37,0,0
+299,291,no,8,0,HSV h6 s1 v0,1e-05,60,Yellow leaf curl virus,48.3,14,,14,5,6,29,6
+300,299,yes,9,0,HSV h2 s1 v0,0.0503,46,Yellow leaf curl virus,60.9,11,,3,5,4,28,6
+301,300,yes,10,1,,,15,Healthy,33.3,3,1.0,3,3,3,1,5
+302,300,no,10,1,,,31,Yellow leaf curl virus,87.1,8,6.0,0,2,1,27,1
+303,299,no,9,0,HSV h2 s1 v0,0.12337,14,Early blight,78.6,3,,11,0,2,1,0
+304,303,yes,10,1,,,12,Early blight,91.7,2,1.0,11,0,1,0,0
+305,303,no,10,1,,,2,Septoria leaf spot,50.0,1,0.0,0,0,1,1,0
+306,278,no,6,0,HSV h1 s1 v1,0.01367,84,Late blight,64.3,22,,16,54,3,11,0
+307,306,yes,7,0,HSV h3 s0 v0,0.00423,33,Late blight,93.9,6,,0,31,0,2,0
+308,307,yes,8,0,HSV h0 s0 v1,0.15658,32,Late blight,96.9,6,,0,31,0,1,0
+309,308,yes,9,1,,,31,Late blight,100.0,6,5.0,0,31,0,0,0
+310,308,no,9,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+311,307,no,8,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+312,306,no,7,0,Lesion fraction,0.20358,51,Late blight,45.1,16,,16,23,3,9,0
+313,312,yes,8,0,HSV h0 s1 v1,0.00051,12,Yellow leaf curl virus,66.7,4,,1,1,2,8,0
+314,313,yes,9,1,,,8,Yellow leaf curl virus,100.0,3,1.0,0,0,0,8,0
+315,313,no,9,0,HSV h5 s0 v1,6e-05,4,Septoria leaf spot,50.0,1,,1,1,2,0,0
+316,315,yes,10,1,,,2,Early blight,50.0,0,0.0,1,1,0,0,0
+317,315,no,10,1,,,2,Septoria leaf spot,100.0,1,1.0,0,0,2,0,0
+318,312,no,8,0,HSV h0 s0 v1,0.07728,39,Late blight,56.4,12,,15,22,1,1,0
+319,318,yes,9,0,HSV h7 s0 v1,1e-05,23,Early blight,65.2,5,,15,7,1,0,0
+320,319,yes,10,1,,,5,Late blight,80.0,0,0.0,0,4,1,0,0
+321,319,no,10,1,,,18,Early blight,83.3,5,3.0,15,3,0,0,0
+322,318,no,9,0,HSV h1 s0 v1,0.03987,16,Late blight,93.8,7,,0,15,0,1,0
+323,322,yes,10,1,,,1,Yellow leaf curl virus,100.0,1,1.0,0,0,0,1,0
+324,322,no,10,1,,,15,Late blight,100.0,6,6.0,0,15,0,0,0
+325,149,no,3,0,HSV h1 s0 v0,0.09116,1348,Septoria leaf spot,49.6,343,,77,533,669,18,51
+326,325,yes,4,0,GLI,0.13846,835,Septoria leaf spot,70.5,204,,45,186,589,15,0
+327,326,yes,5,0,HSV h1 s1 v1,0.25031,191,Late blight,56.5,43,,22,108,61,0,0
+328,327,yes,6,0,GLCM correlation,0.88894,170,Late blight,62.9,32,,21,107,42,0,0
+329,328,yes,7,0,HSV h2 s0 v0,0.33349,46,Septoria leaf spot,63.0,8,,6,11,29,0,0
+330,329,yes,8,0,ExG (normalised),0.15954,40,Septoria leaf spot,72.5,7,,0,11,29,0,0
+331,330,yes,9,0,Hu moment 7,6.03859,7,Late blight,85.7,3,,0,6,1,0,0
+332,331,yes,10,1,,,6,Late blight,100.0,1,1.0,0,6,0,0,0
+333,331,no,10,1,,,1,Septoria leaf spot,100.0,2,0.0,0,0,1,0,0
+334,330,no,9,0,G/R ratio,1.19904,33,Septoria leaf spot,84.8,4,,0,5,28,0,0
+335,334,yes,10,1,,,24,Septoria leaf spot,100.0,2,0.0,0,0,24,0,0
+336,334,no,10,1,,,9,Late blight,55.6,2,0.0,0,5,4,0,0
+337,329,no,8,1,,,6,Early blight,100.0,1,0.0,6,0,0,0,0
+338,328,no,7,0,HSV h7 s0 v1,6e-05,124,Late blight,77.4,24,,15,96,13,0,0
+339,338,yes,8,0,HSV h3 s0 v1,0.41505,93,Late blight,87.1,18,,9,81,3,0,0
+340,339,yes,9,0,GLCM contrast,4.32907,91,Late blight,89.0,18,,7,81,3,0,0
+341,340,yes,10,1,,,77,Late blight,93.5,15,13.0,2,72,3,0,0
+342,340,no,10,1,,,14,Late blight,64.3,3,3.0,5,9,0,0,0
+343,339,no,9,1,,,2,Early blight,100.0,0,0.0,2,0,0,0,0
+344,338,no,8,0,B std,27.42832,31,Late blight,48.4,6,,6,15,10,0,0
+345,344,yes,9,1,,,7,Septoria leaf spot,100.0,1,1.0,0,0,7,0,0
+346,344,no,9,0,HSV h2 s0 v0,0.06184,24,Late blight,62.5,5,,6,15,3,0,0
+347,346,yes,10,1,,,17,Late blight,88.2,4,1.0,0,15,2,0,0
+348,346,no,10,1,,,7,Early blight,85.7,1,1.0,6,0,1,0,0
+349,327,no,6,0,Hu moment 4,6.11242,21,Septoria leaf spot,90.5,11,,1,1,19,0,0
+350,349,yes,7,0,HSV h2 s1 v0,0.00566,20,Septoria leaf spot,95.0,11,,1,0,19,0,0
+351,350,yes,8,1,,,19,Septoria leaf spot,100.0,11,11.0,0,0,19,0,0
+352,350,no,8,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+353,349,no,7,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+354,326,no,5,0,GLCM correlation,0.94758,644,Septoria leaf spot,82.0,161,,23,78,528,15,0
+355,354,yes,6,0,HSV h1 s0 v0,0.05325,613,Septoria leaf spot,85.3,153,,21,61,523,8,0
+356,355,yes,7,0,GLCM homogeneity,0.78617,393,Septoria leaf spot,91.9,104,,8,18,361,6,0
+357,356,yes,8,0,HSV h0 s0 v0,0.00015,389,Septoria leaf spot,92.8,103,,8,18,361,2,0
+358,357,yes,9,0,HSV h2 s1 v0,0.02575,4,Late blight,75.0,2,,0,3,1,0,0
+359,358,yes,10,1,,,3,Late blight,100.0,2,1.0,0,3,0,0,0
+360,358,no,10,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+361,357,no,9,0,HSV h3 s0 v1,0.03052,385,Septoria leaf spot,93.5,101,,8,15,360,2,0
+362,361,yes,10,1,,,376,Septoria leaf spot,94.4,96,82.0,5,14,355,2,0
+363,361,no,10,1,,,9,Septoria leaf spot,55.6,5,3.0,3,1,5,0,0
+364,356,no,8,1,,,4,Yellow leaf curl virus,100.0,1,1.0,0,0,0,4,0
+365,355,no,7,0,HSV h1 s1 v0,0.01422,220,Septoria leaf spot,73.6,49,,13,43,162,2,0
+366,365,yes,8,0,GLCM contrast,0.87603,11,Late blight,90.9,5,,0,10,1,0,0
+367,366,yes,9,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+368,366,no,9,1,,,10,Late blight,100.0,5,4.0,0,10,0,0,0
+369,365,no,8,0,HSV h2 s0 v0,0.00215,209,Septoria leaf spot,77.0,44,,13,33,161,2,0
+370,369,yes,9,0,HSV h1 s0 v1,0.21532,22,Late blight,50.0,3,,4,11,7,0,0
+371,370,yes,10,1,,,9,Septoria leaf spot,77.8,2,2.0,2,0,7,0,0
+372,370,no,10,1,,,13,Late blight,84.6,1,1.0,2,11,0,0,0
+373,369,no,9,0,HSV h0 s0 v1,0.10268,187,Septoria leaf spot,82.4,41,,9,22,154,2,0
+374,373,yes,10,1,,,182,Septoria leaf spot,84.6,39,30.0,9,17,154,2,0
+375,373,no,10,1,,,5,Late blight,100.0,2,2.0,0,5,0,0,0
+376,354,no,6,0,GLCM energy,0.21483,31,Late blight,54.8,8,,2,17,5,7,0
+377,376,yes,7,0,ExG (normalised),0.26503,24,Late blight,70.8,3,,2,17,5,0,0
+378,377,yes,8,0,Hu moment 3,4.10811,19,Late blight,89.5,3,,2,17,0,0,0
+379,378,yes,9,1,,,17,Late blight,100.0,2,1.0,0,17,0,0,0
+380,378,no,9,1,,,2,Early blight,100.0,1,0.0,2,0,0,0,0
+381,377,no,8,1,,,5,Septoria leaf spot,100.0,0,0.0,0,0,5,0,0
+382,376,no,7,1,,,7,Yellow leaf curl virus,100.0,5,5.0,0,0,0,7,0
+383,325,no,4,0,GLCM homogeneity,0.46669,513,Late blight,67.6,139,,32,347,80,3,51
+384,383,yes,5,0,HSV h3 s0 v0,0.00038,50,Healthy,92.0,19,,0,2,2,0,46
+385,384,yes,6,1,,,45,Healthy,100.0,15,14.0,0,0,0,0,45
+386,384,no,6,0,G/R ratio,1.14184,5,Late blight,40.0,4,,0,2,2,0,1
+387,386,yes,7,0,GLCM dissimilarity,1.70878,3,Late blight,66.7,4,,0,2,0,0,1
+388,387,yes,8,1,,,1,Healthy,100.0,2,1.0,0,0,0,0,1
+389,387,no,8,1,,,2,Late blight,100.0,2,0.0,0,2,0,0,0
+390,386,no,7,1,,,2,Septoria leaf spot,100.0,0,0.0,0,0,2,0,0
+391,383,no,5,0,R mean,109.94585,463,Late blight,74.5,120,,32,345,78,3,5
+392,391,yes,6,0,HSV h0 s0 v1,0.03725,152,Septoria leaf spot,43.4,44,,21,61,66,1,3
+393,392,yes,7,0,GLCM homogeneity,0.60958,118,Septoria leaf spot,54.2,31,,20,30,64,1,3
+394,393,yes,8,0,HSV h3 s0 v0,0.00018,84,Septoria leaf spot,65.5,25,,18,8,55,0,3
+395,394,yes,9,0,B std,28.84899,28,Early blight,50.0,9,,14,2,9,0,3
+396,395,yes,10,1,,,11,Septoria leaf spot,81.8,5,1.0,2,0,9,0,0
+397,395,no,10,1,,,17,Early blight,70.6,4,1.0,12,2,0,0,3
+398,394,no,9,0,GLCM correlation,0.91812,56,Septoria leaf spot,82.1,16,,4,6,46,0,0
+399,398,yes,10,1,,,49,Septoria leaf spot,91.8,15,11.0,3,1,45,0,0
+400,398,no,10,1,,,7,Late blight,71.4,1,1.0,1,5,1,0,0
+401,393,no,8,0,HSV h0 s1 v0,0.00111,34,Late blight,64.7,6,,2,22,9,1,0
+402,401,yes,9,0,ExG (normalised),0.30162,21,Late blight,90.5,3,,0,19,2,0,0
+403,402,yes,10,1,,,19,Late blight,100.0,2,2.0,0,19,0,0,0
+404,402,no,10,1,,,2,Septoria leaf spot,100.0,1,0.0,0,0,2,0,0
+405,401,no,9,0,HSV h2 s1 v0,0.04372,13,Septoria leaf spot,53.8,3,,2,3,7,1,0
+406,405,yes,10,1,,,5,Early blight,40.0,2,0.0,2,2,0,1,0
+407,405,no,10,1,,,8,Septoria leaf spot,87.5,1,1.0,0,1,7,0,0
+408,392,no,7,0,HSV h1 s0 v0,0.10113,34,Late blight,91.2,13,,1,31,2,0,0
+409,408,yes,8,1,,,2,Septoria leaf spot,100.0,2,1.0,0,0,2,0,0
+410,408,no,8,0,G std,24.21746,32,Late blight,96.9,11,,1,31,0,0,0
+411,410,yes,9,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+412,410,no,9,1,,,31,Late blight,100.0,11,10.0,0,31,0,0,0
+413,391,no,6,0,Hu moment 1,0.75307,311,Late blight,91.3,76,,11,284,12,2,2
+414,413,yes,7,0,GLCM homogeneity,0.51982,266,Late blight,95.5,69,,3,254,8,0,1
+415,414,yes,8,0,GLCM ASM,0.01546,36,Late blight,77.8,11,,0,28,7,0,1
+416,415,yes,9,0,HSV h6 s0 v0,0.00073,31,Late blight,90.3,10,,0,28,2,0,1
+417,416,yes,10,1,,,29,Late blight,96.6,10,5.0,0,28,1,0,0
+418,416,no,10,1,,,2,Septoria leaf spot,50.0,0,0.0,0,0,1,0,1
+419,415,no,9,1,,,5,Septoria leaf spot,100.0,1,1.0,0,0,5,0,0
+420,414,no,8,0,G mean,114.20138,230,Late blight,98.3,58,,3,226,1,0,0
+421,420,yes,9,1,,,1,Early blight,100.0,1,0.0,1,0,0,0,0
+422,420,no,9,0,HSV h0 s0 v0,0.1508,229,Late blight,98.7,57,,2,226,1,0,0
+423,422,yes,10,1,,,228,Late blight,99.1,56,53.0,1,226,1,0,0
+424,422,no,10,1,,,1,Early blight,100.0,1,0.0,1,0,0,0,0
+425,413,no,7,0,HSV h0 s0 v1,0.03927,45,Late blight,66.7,7,,8,30,4,2,1
+426,425,yes,8,0,GLCM dissimilarity,1.08616,18,Early blight,38.9,3,,7,7,1,2,1
+427,426,yes,9,0,Hu moment 2,3.31603,10,Late blight,70.0,1,,1,7,0,2,0
+428,427,yes,10,1,,,7,Late blight,100.0,1,1.0,0,7,0,0,0
+429,427,no,10,1,,,3,Yellow leaf curl virus,66.7,0,0.0,1,0,0,2,0
+430,426,no,9,0,Hu moment 6,6.79286,8,Early blight,75.0,2,,6,0,1,0,1
+431,430,yes,10,1,,,6,Early blight,100.0,2,1.0,6,0,0,0,0
+432,430,no,10,1,,,2,Septoria leaf spot,50.0,0,0.0,0,0,1,0,1
+433,425,no,8,0,GLCM correlation,0.87728,27,Late blight,85.2,4,,1,23,3,0,0
+434,433,yes,9,0,Lesion fraction,0.14424,4,Septoria leaf spot,50.0,1,,1,1,2,0,0
+435,434,yes,10,1,,,2,Septoria leaf spot,100.0,0,0.0,0,0,2,0,0
+436,434,no,10,1,,,2,Early blight,50.0,1,1.0,1,1,0,0,0
+437,433,no,9,0,G/R ratio,1.12581,23,Late blight,95.7,3,,0,22,1,0,0
+438,437,yes,10,1,,,21,Late blight,100.0,3,2.0,0,21,0,0,0
+439,437,no,10,1,,,2,Late blight,50.0,0,0.0,0,1,1,0,0
+440,0,no,1,0,GLCM correlation,0.88599,4472,Yellow leaf curl virus,82.2,1093,,118,261,407,3674,12
+441,440,yes,2,0,G mean,98.84001,426,Septoria leaf spot,53.8,110,,27,49,229,109,12
+442,441,yes,3,0,GLCM ASM,0.03235,155,Yellow leaf curl virus,60.0,46,,27,7,26,93,2
+443,442,yes,4,0,HSV h0 s1 v1,0.00045,107,Yellow leaf curl virus,77.6,36,,6,4,14,83,0
+444,443,yes,5,0,HSV h2 s0 v0,0.52134,101,Yellow leaf curl virus,82.2,35,,6,3,9,83,0
+445,444,yes,6,0,Hu moment 3,2.76536,97,Yellow leaf curl virus,85.6,30,,6,3,5,83,0
+446,445,yes,7,0,B mean,46.87125,14,Yellow leaf curl virus,42.9,3,,2,2,4,6,0
+447,446,yes,8,0,R std,24.40011,7,Yellow leaf curl virus,85.7,2,,1,0,0,6,0
+448,447,yes,9,1,,,1,Early blight,100.0,1,0.0,1,0,0,0,0
+449,447,no,9,1,,,6,Yellow leaf curl virus,100.0,1,0.0,0,0,0,6,0
+450,446,no,8,0,HSV h1 s0 v1,0.02163,7,Septoria leaf spot,57.1,1,,1,2,4,0,0
+451,450,yes,9,0,Hu moment 5,7.32901,3,Late blight,66.7,0,,1,2,0,0,0
+452,451,yes,10,1,,,2,Late blight,100.0,0,0.0,0,2,0,0,0
+453,451,no,10,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+454,450,no,9,1,,,4,Septoria leaf spot,100.0,1,0.0,0,0,4,0,0
+455,445,no,7,0,B mean,57.7104,83,Yellow leaf curl virus,92.8,27,,4,1,1,77,0
+456,455,yes,8,0,HSV h7 s0 v1,0.00064,79,Yellow leaf curl virus,96.2,26,,2,0,1,76,0
+457,456,yes,9,0,R std,19.1082,78,Yellow leaf curl virus,97.4,23,,2,0,0,76,0
+458,457,yes,10,1,,,1,Early blight,100.0,1,0.0,1,0,0,0,0
+459,457,no,10,1,,,77,Yellow leaf curl virus,98.7,22,19.0,1,0,0,76,0
+460,456,no,9,1,,,1,Septoria leaf spot,100.0,3,0.0,0,0,1,0,0
+461,455,no,8,0,B mean,59.13832,4,Early blight,50.0,1,,2,1,0,1,0
+462,461,yes,9,1,,,2,Early blight,100.0,1,0.0,2,0,0,0,0
+463,461,no,9,0,HSV h2 s1 v1,8e-05,2,Late blight,50.0,0,,0,1,0,1,0
+464,463,yes,10,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+465,463,no,10,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+466,444,no,6,1,,,4,Septoria leaf spot,100.0,5,0.0,0,0,4,0,0
+467,443,no,5,0,HSV h1 s1 v1,0.04117,6,Septoria leaf spot,83.3,1,,0,1,5,0,0
+468,467,yes,6,1,,,5,Septoria leaf spot,100.0,0,0.0,0,0,5,0,0
+469,467,no,6,1,,,1,Late blight,100.0,1,1.0,0,1,0,0,0
+470,442,no,4,0,HSV h3 s0 v1,0.00014,48,Early blight,43.8,10,,21,3,12,10,2
+471,470,yes,5,0,R mean,48.81834,25,Septoria leaf spot,36.0,9,,2,3,9,9,2
+472,471,yes,6,1,,,6,Yellow leaf curl virus,100.0,1,0.0,0,0,0,6,0
+473,471,no,6,0,HSV h1 s0 v1,0.0042,19,Septoria leaf spot,47.4,8,,2,3,9,3,2
+474,473,yes,7,0,HSV h5 s0 v0,0.00067,7,Early blight,28.6,3,,2,2,0,1,2
+475,474,yes,8,0,HSV h0 s0 v1,0.00012,5,Early blight,40.0,3,,2,2,0,1,0
+476,475,yes,9,1,,,2,Late blight,100.0,3,1.0,0,2,0,0,0
+477,475,no,9,0,GLI,0.2296,3,Early blight,66.7,0,,2,0,0,1,0
+478,477,yes,10,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+479,477,no,10,1,,,2,Early blight,100.0,0,0.0,2,0,0,0,0
+480,474,no,8,1,,,2,Healthy,100.0,0,0.0,0,0,0,0,2
+481,473,no,7,0,R mean,65.69524,12,Septoria leaf spot,75.0,5,,0,1,9,2,0
+482,481,yes,8,0,HSV h0 s0 v0,0.00097,10,Septoria leaf spot,90.0,5,,0,0,9,1,0
+483,482,yes,9,1,,,1,Yellow leaf curl virus,100.0,2,0.0,0,0,0,1,0
+484,482,no,9,1,,,9,Septoria leaf spot,100.0,3,2.0,0,0,9,0,0
+485,481,no,8,0,Hu moment 2,2.66333,2,Late blight,50.0,0,,0,1,0,1,0
+486,485,yes,9,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+487,485,no,9,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+488,470,no,5,0,G mean,92.99675,23,Early blight,82.6,1,,19,0,3,1,0
+489,488,yes,6,0,Hu moment 7,11.64727,20,Early blight,95.0,1,,19,0,0,1,0
+490,489,yes,7,1,,,19,Early blight,100.0,1,0.0,19,0,0,0,0
+491,489,no,7,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+492,488,no,6,1,,,3,Septoria leaf spot,100.0,0,0.0,0,0,3,0,0
+493,441,no,3,0,Lesion fraction,0.00037,271,Septoria leaf spot,74.9,64,,0,42,203,16,10
+494,493,yes,4,0,R std,16.90979,35,Late blight,48.6,10,,0,17,3,5,10
+495,494,yes,5,0,HSV h2 s0 v1,0.01852,13,Healthy,76.9,1,,0,0,3,0,10
+496,495,yes,6,1,,,3,Septoria leaf spot,100.0,0,0.0,0,0,3,0,0
+497,495,no,6,1,,,10,Healthy,100.0,1,0.0,0,0,0,0,10
+498,494,no,5,0,GLI,0.26421,22,Late blight,77.3,9,,0,17,0,5,0
+499,498,yes,6,1,,,16,Late blight,100.0,6,4.0,0,16,0,0,0
+500,498,no,6,0,G/R ratio,1.61782,6,Yellow leaf curl virus,83.3,3,,0,1,0,5,0
+501,500,yes,7,1,,,5,Yellow leaf curl virus,100.0,2,1.0,0,0,0,5,0
+502,500,no,7,1,,,1,Late blight,100.0,1,1.0,0,1,0,0,0
+503,493,no,4,0,HSV h1 s0 v0,0.06679,236,Septoria leaf spot,84.7,54,,0,25,200,11,0
+504,503,yes,5,0,HSV h4 s0 v0,0.00333,176,Septoria leaf spot,94.9,44,,0,5,167,4,0
+505,504,yes,6,0,GLI,0.35279,175,Septoria leaf spot,95.4,44,,0,5,167,3,0
+506,505,yes,7,0,Hu moment 4,5.95234,174,Septoria leaf spot,96.0,44,,0,4,167,3,0
+507,506,yes,8,0,HSV h2 s1 v1,0.37001,157,Septoria leaf spot,98.1,39,,0,1,154,2,0
+508,507,yes,9,0,Lesion fraction,0.00076,155,Septoria leaf spot,98.7,38,,0,0,153,2,0
+509,508,yes,10,1,,,3,Septoria leaf spot,66.7,0,0.0,0,0,2,1,0
+510,508,no,10,1,,,152,Septoria leaf spot,99.3,38,37.0,0,0,151,1,0
+511,507,no,9,0,GLCM ASM,0.06343,2,Late blight,50.0,1,,0,1,1,0,0
+512,511,yes,10,1,,,1,Late blight,100.0,1,1.0,0,1,0,0,0
+513,511,no,10,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+514,506,no,8,0,HSV h3 s0 v0,6e-05,17,Septoria leaf spot,76.5,5,,0,3,13,1,0
+515,514,yes,9,0,HSV h1 s0 v1,0.0573,4,Late blight,75.0,3,,0,3,1,0,0
+516,515,yes,10,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+517,515,no,10,1,,,3,Late blight,100.0,3,2.0,0,3,0,0,0
+518,514,no,9,0,Hu moment 3,3.23256,13,Septoria leaf spot,92.3,2,,0,0,12,1,0
+519,518,yes,10,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+520,518,no,10,1,,,12,Septoria leaf spot,100.0,2,2.0,0,0,12,0,0
+521,505,no,7,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+522,504,no,6,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+523,503,no,5,0,HSV h1 s1 v0,0.05867,60,Septoria leaf spot,55.0,10,,0,20,33,7,0
+524,523,yes,6,0,Hu moment 3,3.06872,17,Late blight,88.2,2,,0,15,2,0,0
+525,524,yes,7,1,,,2,Septoria leaf spot,100.0,0,0.0,0,0,2,0,0
+526,524,no,7,1,,,15,Late blight,100.0,2,2.0,0,15,0,0,0
+527,523,no,6,0,G mean,109.30128,43,Septoria leaf spot,72.1,8,,0,5,31,7,0
+528,527,yes,7,0,GLCM ASM,0.02048,8,Yellow leaf curl virus,75.0,2,,0,2,0,6,0
+529,528,yes,8,1,,,6,Yellow leaf curl virus,100.0,0,0.0,0,0,0,6,0
+530,528,no,8,1,,,2,Late blight,100.0,2,0.0,0,2,0,0,0
+531,527,no,7,0,Hu moment 7,-11.69204,35,Septoria leaf spot,88.6,6,,0,3,31,1,0
+532,531,yes,8,1,,,3,Late blight,100.0,0,0.0,0,3,0,0,0
+533,531,no,8,0,HSV h1 s1 v1,0.48386,32,Septoria leaf spot,96.9,6,,0,0,31,1,0
+534,533,yes,9,1,,,31,Septoria leaf spot,100.0,6,6.0,0,0,31,0,0
+535,533,no,9,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+536,440,no,2,0,HSV h2 s0 v1,0.1593,4046,Yellow leaf curl virus,88.1,983,,91,212,178,3565,0
+537,536,yes,3,0,HSV h0 s1 v1,0.00091,3856,Yellow leaf curl virus,91.4,929,,84,110,137,3525,0
+538,537,yes,4,0,GLCM ASM,0.04271,3749,Yellow leaf curl virus,93.4,901,,70,102,77,3500,0
+539,538,yes,5,0,HSV h3 s0 v1,0.01172,3478,Yellow leaf curl virus,95.5,835,,49,56,50,3323,0
+540,539,yes,6,0,HSV h0 s1 v0,0.00034,3461,Yellow leaf curl virus,95.9,832,,40,51,50,3320,0
+541,540,yes,7,0,GLI,0.22629,2640,Yellow leaf curl virus,98.6,617,,8,22,7,2603,0
+542,541,yes,8,0,Hu moment 2,1.8747,114,Yellow leaf curl virus,86.8,25,,1,14,0,99,0
+543,542,yes,9,0,HSV h0 s0 v0,0.00028,10,Late blight,70.0,1,,0,7,0,3,0
+544,543,yes,10,1,,,7,Late blight,100.0,1,1.0,0,7,0,0,0
+545,543,no,10,1,,,3,Yellow leaf curl virus,100.0,0,0.0,0,0,0,3,0
+546,542,no,9,0,HSV h2 s1 v1,0.09168,104,Yellow leaf curl virus,92.3,24,,1,7,0,96,0
+547,546,yes,10,1,,,100,Yellow leaf curl virus,96.0,22,20.0,1,3,0,96,0
+548,546,no,10,1,,,4,Late blight,100.0,2,0.0,0,4,0,0,0
+549,541,no,8,0,HSV h3 s1 v0,0.18181,2526,Yellow leaf curl virus,99.1,592,,7,8,7,2504,0
+550,549,yes,9,0,HSV h2 s0 v0,0.66088,2525,Yellow leaf curl virus,99.2,592,,6,8,7,2504,0
+551,550,yes,10,1,,,2524,Yellow leaf curl virus,99.2,591,579.0,6,7,7,2504,0
+552,550,no,10,1,,,1,Late blight,100.0,1,1.0,0,1,0,0,0
+553,549,no,9,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+554,540,no,7,0,GLCM energy,0.15475,821,Yellow leaf curl virus,87.3,215,,32,29,43,717,0
+555,554,yes,8,0,R std,24.02877,609,Yellow leaf curl virus,95.6,160,,4,15,8,582,0
+556,555,yes,9,0,HSV h0 s0 v0,0.0184,4,Early blight,75.0,0,,3,1,0,0,0
+557,556,yes,10,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+558,556,no,10,1,,,3,Early blight,100.0,0,0.0,3,0,0,0,0
+559,555,no,9,0,HSV h6 s0 v1,0.00013,605,Yellow leaf curl virus,96.2,160,,1,14,8,582,0
+560,559,yes,10,1,,,594,Yellow leaf curl virus,97.1,155,147.0,1,14,2,577,0
+561,559,no,10,1,,,11,Septoria leaf spot,54.5,5,1.0,0,0,6,5,0
+562,554,no,8,0,GLCM contrast,1.56589,212,Yellow leaf curl virus,63.7,55,,28,14,35,135,0
+563,562,yes,9,0,HSV h1 s0 v1,0.00612,157,Yellow leaf curl virus,77.1,43,,22,5,9,121,0
+564,563,yes,10,1,,,32,Early blight,50.0,3,1.0,16,3,0,13,0
+565,563,no,10,1,,,125,Yellow leaf curl virus,86.4,40,36.0,6,2,9,108,0
+566,562,no,9,0,HSV h1 s0 v0,0.06417,55,Septoria leaf spot,47.3,12,,6,9,26,14,0
+567,566,yes,10,1,,,26,Septoria leaf spot,92.3,3,2.0,0,1,24,1,0
+568,566,no,10,1,,,29,Yellow leaf curl virus,44.8,9,7.0,6,8,2,13,0
+569,539,no,6,0,Hu moment 3,3.41254,17,Early blight,52.9,3,,9,5,0,3,0
+570,569,yes,7,0,G mean,85.64304,13,Early blight,69.2,2,,9,1,0,3,0
+571,570,yes,8,1,,,8,Early blight,100.0,0,0.0,8,0,0,0,0
+572,570,no,8,0,G/R ratio,1.45032,5,Yellow leaf curl virus,60.0,2,,1,1,0,3,0
+573,572,yes,9,0,ExG (normalised),0.33033,2,Early blight,50.0,1,,1,1,0,0,0
+574,573,yes,10,1,,,1,Late blight,100.0,1,0.0,0,1,0,0,0
+575,573,no,10,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+576,572,no,9,1,,,3,Yellow leaf curl virus,100.0,1,0.0,0,0,0,3,0
+577,569,no,7,1,,,4,Late blight,100.0,1,0.0,0,4,0,0,0
+578,538,no,5,0,HSV h1 s1 v1,0.11163,271,Yellow leaf curl virus,65.3,66,,21,46,27,177,0
+579,578,yes,6,0,HSV h2 s0 v1,0.01482,126,Yellow leaf curl virus,41.3,27,,21,46,7,52,0
+580,579,yes,7,0,HSV h3 s0 v1,0.00025,72,Yellow leaf curl virus,63.9,13,,16,10,0,46,0
+581,580,yes,8,0,HSV h1 s0 v0,0.09431,55,Yellow leaf curl virus,78.2,11,,3,9,0,43,0
+582,581,yes,9,0,HSV h7 s1 v0,1e-05,43,Yellow leaf curl virus,95.3,9,,1,1,0,41,0
+583,582,yes,10,1,,,41,Yellow leaf curl virus,100.0,9,9.0,0,0,0,41,0
+584,582,no,10,1,,,2,Early blight,50.0,0,0.0,1,1,0,0,0
+585,581,no,9,0,Hu moment 5,8.70125,12,Late blight,66.7,2,,2,8,0,2,0
+586,585,yes,10,1,,,9,Late blight,88.9,0,0.0,1,8,0,0,0
+587,585,no,10,1,,,3,Yellow leaf curl virus,66.7,2,0.0,1,0,0,2,0
+588,580,no,8,0,HSV h7 s0 v0,0.00016,17,Early blight,76.5,2,,13,1,0,3,0
+589,588,yes,9,0,B mean,46.30136,5,Yellow leaf curl virus,60.0,1,,1,1,0,3,0
+590,589,yes,10,1,,,3,Yellow leaf curl virus,100.0,1,0.0,0,0,0,3,0
+591,589,no,10,1,,,2,Early blight,50.0,0,0.0,1,1,0,0,0
+592,588,no,9,1,,,12,Early blight,100.0,1,1.0,12,0,0,0,0
+593,579,no,7,0,G mean,116.1573,54,Late blight,66.7,14,,5,36,7,6,0
+594,593,yes,8,0,HSV h0 s0 v0,0.00275,33,Late blight,45.5,9,,5,15,7,6,0
+595,594,yes,9,0,HSV h2 s1 v1,0.02414,15,Late blight,86.7,3,,0,13,0,2,0
+596,595,yes,10,1,,,13,Late blight,100.0,3,3.0,0,13,0,0,0
+597,595,no,10,1,,,2,Yellow leaf curl virus,100.0,0,0.0,0,0,0,2,0
+598,594,no,9,0,G std,22.87057,18,Septoria leaf spot,38.9,6,,5,2,7,4,0
+599,598,yes,10,1,,,8,Septoria leaf spot,87.5,4,2.0,0,1,7,0,0
+600,598,no,10,1,,,10,Early blight,50.0,2,0.0,5,1,0,4,0
+601,593,no,8,1,,,21,Late blight,100.0,5,4.0,0,21,0,0,0
+602,578,no,6,0,GLCM correlation,0.92459,145,Yellow leaf curl virus,86.2,39,,0,0,20,125,0
+603,602,yes,7,0,HSV h0 s0 v0,0.00224,29,Septoria leaf spot,62.1,9,,0,0,18,11,0
+604,603,yes,8,1,,,9,Yellow leaf curl virus,100.0,3,3.0,0,0,0,9,0
+605,603,no,8,0,HSV h1 s0 v1,0.03119,20,Septoria leaf spot,90.0,6,,0,0,18,2,0
+606,605,yes,9,1,,,2,Yellow leaf curl virus,100.0,0,0.0,0,0,0,2,0
+607,605,no,9,1,,,18,Septoria leaf spot,100.0,6,6.0,0,0,18,0,0
+608,602,no,7,0,HSV h0 s0 v1,0.00371,116,Yellow leaf curl virus,98.3,30,,0,0,2,114,0
+609,608,yes,8,1,,,114,Yellow leaf curl virus,100.0,30,30.0,0,0,0,114,0
+610,608,no,8,1,,,2,Septoria leaf spot,100.0,0,0.0,0,0,2,0,0
+611,537,no,4,0,HSV h1 s0 v0,0.03522,107,Septoria leaf spot,56.1,28,,14,8,60,25,0
+612,611,yes,5,0,R mean,145.65658,44,Septoria leaf spot,97.7,12,,0,0,43,1,0
+613,612,yes,6,1,,,43,Septoria leaf spot,100.0,11,11.0,0,0,43,0,0
+614,612,no,6,1,,,1,Yellow leaf curl virus,100.0,1,1.0,0,0,0,1,0
+615,611,no,5,0,HSV h1 s1 v1,0.15516,63,Yellow leaf curl virus,38.1,16,,14,8,17,24,0
+616,615,yes,6,0,HSV h0 s0 v1,0.04707,21,Early blight,66.7,5,,14,5,2,0,0
+617,616,yes,7,0,GLCM energy,0.1423,17,Early blight,82.4,4,,14,1,2,0,0
+618,617,yes,8,0,Hu moment 4,4.25205,4,Septoria leaf spot,50.0,3,,1,1,2,0,0
+619,618,yes,9,0,Hu moment 1,0.64134,2,Early blight,50.0,1,,1,1,0,0,0
+620,619,yes,10,1,,,1,Late blight,100.0,1,1.0,0,1,0,0,0
+621,619,no,10,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+622,618,no,9,1,,,2,Septoria leaf spot,100.0,2,1.0,0,0,2,0,0
+623,617,no,8,1,,,13,Early blight,100.0,1,1.0,13,0,0,0,0
+624,616,no,7,1,,,4,Late blight,100.0,1,0.0,0,4,0,0,0
+625,615,no,6,0,G std,30.18151,42,Yellow leaf curl virus,57.1,11,,0,3,15,24,0
+626,625,yes,7,0,Hu moment 2,2.94495,14,Septoria leaf spot,71.4,6,,0,3,10,1,0
+627,626,yes,8,0,Hu moment 3,2.7254,11,Septoria leaf spot,90.9,3,,0,0,10,1,0
+628,627,yes,9,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+629,627,no,9,1,,,10,Septoria leaf spot,100.0,3,3.0,0,0,10,0,0
+630,626,no,8,1,,,3,Late blight,100.0,3,1.0,0,3,0,0,0
+631,625,no,7,0,HSV h2 s0 v0,0.0072,28,Yellow leaf curl virus,82.1,5,,0,0,5,23,0
+632,631,yes,8,0,HSV h4 s0 v1,0.00012,7,Septoria leaf spot,71.4,1,,0,0,5,2,0
+633,632,yes,9,1,,,5,Septoria leaf spot,100.0,1,1.0,0,0,5,0,0
+634,632,no,9,1,,,2,Yellow leaf curl virus,100.0,0,0.0,0,0,0,2,0
+635,631,no,8,1,,,21,Yellow leaf curl virus,100.0,4,4.0,0,0,0,21,0
+636,536,no,3,0,HSV h1 s1 v0,0.03245,190,Late blight,53.7,54,,7,102,41,40,0
+637,636,yes,4,0,HSV h3 s1 v0,0.00117,111,Late blight,82.0,26,,1,91,6,13,0
+638,637,yes,5,0,HSV h1 s1 v1,0.1778,99,Late blight,89.9,25,,1,89,5,4,0
+639,638,yes,6,0,Lesion fraction,0.01272,94,Late blight,94.7,24,,1,89,4,0,0
+640,639,yes,7,0,HSV h6 s0 v1,0.00222,88,Late blight,98.9,24,,0,87,1,0,0
+641,640,yes,8,1,,,87,Late blight,100.0,24,19.0,0,87,0,0,0
+642,640,no,8,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+643,639,no,7,0,Lesion fraction,0.01911,6,Septoria leaf spot,50.0,0,,1,2,3,0,0
+644,643,yes,8,1,,,3,Septoria leaf spot,100.0,0,0.0,0,0,3,0,0
+645,643,no,8,0,HSV h2 s1 v1,0.05947,3,Late blight,66.7,0,,1,2,0,0,0
+646,645,yes,9,1,,,1,Early blight,100.0,0,0.0,1,0,0,0,0
+647,645,no,9,1,,,2,Late blight,100.0,0,0.0,0,2,0,0,0
+648,638,no,6,0,GLCM dissimilarity,0.66978,5,Yellow leaf curl virus,80.0,1,,0,0,1,4,0
+649,648,yes,7,1,,,4,Yellow leaf curl virus,100.0,1,0.0,0,0,0,4,0
+650,648,no,7,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+651,637,no,5,0,B mean,68.1797,12,Yellow leaf curl virus,75.0,1,,0,2,1,9,0
+652,651,yes,6,1,,,9,Yellow leaf curl virus,100.0,0,0.0,0,0,0,9,0
+653,651,no,6,0,GLCM correlation,0.93723,3,Late blight,66.7,1,,0,2,1,0,0
+654,653,yes,7,1,,,1,Septoria leaf spot,100.0,0,0.0,0,0,1,0,0
+655,653,no,7,1,,,2,Late blight,100.0,1,1.0,0,2,0,0,0
+656,636,no,4,0,HSV h0 s1 v1,1e-05,79,Septoria leaf spot,44.3,28,,6,11,35,27,0
+657,656,yes,5,0,GLCM energy,0.1289,57,Yellow leaf curl virus,45.6,23,,6,11,14,26,0
+658,657,yes,6,0,HSV h2 s1 v1,0.00363,27,Yellow leaf curl virus,77.8,14,,3,1,2,21,0
+659,658,yes,7,0,HSV h5 s0 v1,5e-05,5,Early blight,60.0,4,,3,0,2,0,0
+660,659,yes,8,1,,,3,Early blight,100.0,3,0.0,3,0,0,0,0
+661,659,no,8,1,,,2,Septoria leaf spot,100.0,1,1.0,0,0,2,0,0
+662,658,no,7,0,Hu moment 2,1.94726,22,Yellow leaf curl virus,95.5,10,,0,1,0,21,0
+663,662,yes,8,1,,,1,Late blight,100.0,0,0.0,0,1,0,0,0
+664,662,no,8,1,,,21,Yellow leaf curl virus,100.0,10,9.0,0,0,0,21,0
+665,657,no,6,0,Lesion fraction,0.0007,30,Septoria leaf spot,40.0,9,,3,10,12,5,0
+666,665,yes,7,0,HSV h2 s0 v1,0.1931,8,Late blight,87.5,1,,0,7,0,1,0
+667,666,yes,8,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+668,666,no,8,1,,,7,Late blight,100.0,1,0.0,0,7,0,0,0
+669,665,no,7,0,HSV h2 s1 v1,0.00148,22,Septoria leaf spot,54.5,8,,3,3,12,4,0
+670,669,yes,8,1,,,3,Early blight,100.0,2,2.0,3,0,0,0,0
+671,669,no,8,0,GLCM correlation,0.94554,19,Septoria leaf spot,63.2,6,,0,3,12,4,0
+672,671,yes,9,0,G mean,134.90845,14,Septoria leaf spot,85.7,5,,0,1,12,1,0
+673,672,yes,10,1,,,13,Septoria leaf spot,92.3,3,2.0,0,1,12,0,0
+674,672,no,10,1,,,1,Yellow leaf curl virus,100.0,2,1.0,0,0,0,1,0
+675,671,no,9,0,HSV h4 s0 v0,0.00079,5,Yellow leaf curl virus,60.0,1,,0,2,0,3,0
+676,675,yes,10,1,,,3,Yellow leaf curl virus,100.0,1,0.0,0,0,0,3,0
+677,675,no,10,1,,,2,Late blight,100.0,0,0.0,0,2,0,0,0
+678,656,no,5,0,Lesion fraction,0.00217,22,Septoria leaf spot,95.5,5,,0,0,21,1,0
+679,678,yes,6,1,,,1,Yellow leaf curl virus,100.0,0,0.0,0,0,0,1,0
+680,678,no,6,1,,,21,Septoria leaf spot,100.0,5,4.0,0,0,21,0,0

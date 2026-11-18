@@ -243,7 +243,7 @@ def page_compare():
                    "(top of the table) and treat this leaf as uncertain.")
 
     # ---- every model
-    st.subheader("What each model says")
+    st.subheader("2 · What each model says")
     show = table.sort_values("Held-out accuracy (%)", ascending=False)
     colour = lambda s: [f"color: {VERMILION}; font-weight: 600" if x == "DISEASED" else f"color: {GREEN}; font-weight: 600" for x in s]
     st.dataframe(show.style.apply(colour, subset=["Healthy or diseased"]).format(
@@ -259,6 +259,10 @@ def page_compare():
     ax.set_xlim(0, 150); ax.set_xticks([0, 25, 50, 75, 100]); ax.set_xlabel("confidence in its answer (%)")
     ax.set_title("Each model's answer (red = diseased, green = healthy)", loc="left")
     st.pyplot(fig, width="stretch"); plt.close(fig)
+
+    from src import app_charts
+    models = get_models()
+    app_charts.leaf_section(img, info["features"], info["probs"], models.get("logreg") if models else None)
 
 
 def page_results(models):
@@ -490,8 +494,9 @@ TOPIC_TITLES = {
 
 def page_graphs():
     st.title("🖼️ All graphs")
-    st.write("The graphs of the project (Unit 5), one tab per topic. The same PNG files are in "
-             "`reports/figures/<topic>/` for slides. Regenerate them with `python -m src.unit5`.")
+    st.write("Every saved graph of the project (Units 1-5), one tab per topic, as pictures for slides: the files are in "
+             "`reports/figures/<topic>/`. Regenerate them all with `python -m src.evaluate --all`. For charts you can point "
+             "at and zoom, use the 'interactive' pages.")
     topics = [t for t in config.FIG if any(config.figure_dir(t).glob("*.png"))]
     if not topics:
         st.error("No graphs yet. Run  `python -m src.evaluate`  in the terminal.")
@@ -591,7 +596,8 @@ def main():
     with st.sidebar:
         st.markdown("## 🌿 Leaf Doctor")
         st.caption("Plant disease detection & chlorophyll estimation with classical machine learning")
-        page = st.radio("Page", ["Diagnose a leaf", "Compare all models", "Ask questions", "Model results", "All graphs", "Bayesian LR", "Unit 5",
+        page = st.radio("Page", ["Diagnose a leaf", "Compare all models", "Units 1-4 graphs (interactive)",
+                                 "Unit 5 graphs (interactive)", "Decision tree", "Ask questions", "Model results", "All graphs", "Bayesian LR", "Unit 5",
                                  "Chlorophyll", "How it works"], label_visibility="collapsed")
         st.divider()
         if models is not None:
@@ -607,6 +613,15 @@ def main():
         page_diagnose(models)
     elif page == "Compare all models":
         page_compare()
+    elif page == "Units 1-4 graphs (interactive)":
+        from src import app_charts
+        app_charts.page_units_1_4()
+    elif page == "Unit 5 graphs (interactive)":
+        from src import app_charts
+        app_charts.page_unit5()
+    elif page == "Decision tree":
+        from src import app_charts
+        app_charts.page_tree()
     elif page == "Ask questions":
         page_ask(models)
     elif page == "Model results":

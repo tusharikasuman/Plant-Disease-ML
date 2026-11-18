@@ -136,10 +136,11 @@ def compare(image, bundle: dict) -> tuple[pd.DataFrame, dict]:
     x, seg = F.features_from_array(img)
     names = bundle["class_names"]
     healthy = [i for i, n in enumerate(names) if config.is_healthy(n)]
-    rows = []
+    rows, probs = [], []
     for m in bundle["models"]:
         p = m["model"].predict_proba(x[None])[0]
         i = int(np.argmax(p))
+        probs += [{"Model": m["name"], "Disease": short(n), "Probability (%)": round(100 * float(q), 1)} for n, q in zip(names, p)]
         rows.append({"Model": m["name"] + (" *" if "AdaBoost" in m["name"] else ""), "Syllabus": m["unit"], "Prediction": short(names[i]),
                      "Healthy or diseased": "HEALTHY" if config.is_healthy(names[i]) else "DISEASED",
                      "Confidence (%)": round(100 * float(p[i]), 1), "P(healthy) (%)": round(100 * float(p[healthy].sum()), 1),
@@ -156,7 +157,8 @@ def compare(image, bundle: dict) -> tuple[pd.DataFrame, dict]:
     table = pd.DataFrame(rows)
     info = {"lesion_percent": 100 * float(x[F.LESION_INDEX]), "leaf_found": seg.leaf_found,
             "diseased_votes": int((table["Healthy or diseased"] == "DISEASED").sum()), "n_models": len(table),
-            "majority_disease": table.loc[table["Healthy or diseased"] == "DISEASED", "Prediction"].mode().tolist()}
+            "majority_disease": table.loc[table["Healthy or diseased"] == "DISEASED", "Prediction"].mode().tolist(),
+            "probs": pd.DataFrame(probs), "features": x}
     return table, info
 
 
