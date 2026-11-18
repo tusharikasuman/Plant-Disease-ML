@@ -1,0 +1,56 @@
+feature,importance_%
+ExG (normalised),25.09
+HSV h0 s0 v1,11.37
+GLCM correlation,7.08
+G mean,5.31
+R mean,5.2
+HSV h1 s1 v1,5.2
+HSV h1 s0 v0,5.13
+HSV h2 s0 v1,3.22
+HSV h1 s1 v0,2.74
+GLCM homogeneity,2.16
+HSV h3 s0 v0,2.11
+HSV h0 s1 v1,1.93
+HSV h3 s0 v1,1.88
+GLI,1.54
+GLCM contrast,1.53
+HSV h2 s0 v0,1.28
+HSV h3 s1 v0,1.2
+Lesion fraction,1.16
+HSV h6 s0 v0,1.12
+HSV h1 s0 v1,1.11
+HSV h0 s0 v0,1.08
+GLCM ASM,1.07
+R std,0.95
+B std,0.9
+GLCM energy,0.86
+B mean,0.83
+HSV h2 s1 v0,0.76
+Hu moment 2,0.73
+GLCM dissimilarity,0.59
+G/R ratio,0.49
+HSV h2 s1 v1,0.49
+HSV h7 s0 v0,0.45
+HSV h0 s1 v0,0.45
+HSV h4 s0 v0,0.42
+Hu moment 3,0.38
+HSV h7 s0 v1,0.37
+G std,0.32
+Hu moment 7,0.27
+HSV h4 s0 v1,0.24
+Hu moment 1,0.22
+HSV h6 s1 v0,0.18
+HSV h6 s0 v1,0.16
+Hu moment 5,0.15
+Hu moment 4,0.08
+HSV h5 s0 v1,0.07
+Hu moment 6,0.06
+HSV h7 s1 v0,0.05
+HSV h5 s0 v0,0.03
+HSV h5 s1 v1,0.0
+HSV h6 s1 v1,0.0
+HSV h4 s1 v1,0.0
+HSV h4 s1 v0,0.0
+HSV h3 s1 v1,0.0
+HSV h5 s1 v0,0.0
+HSV h7 s1 v1,0.0

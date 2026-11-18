@@ -1,0 +1,24 @@
+Decision tree (CART, Gini impurity), max_depth=10, min_samples_leaf=1
+Trained on 9,302 leaves, 681 nodes, 341 leaves (end nodes), depth 10
+Held-out accuracy: 84.82% on 2,326 leaves
+weights = training leaves of each class reaching that node, in the order ['Early blight', 'Late blight', 'Septoria leaf spot', 'Yellow leaf curl virus', 'Healthy']
+
+                        precision    recall  f1-score   support
+
+          Early blight      0.636     0.595     0.615       200
+           Late blight      0.760     0.728     0.743       382
+    Septoria leaf spot      0.748     0.788     0.768       354
+Yellow leaf curl virus      0.923     0.933     0.928      1072
+               Healthy      0.937     0.934     0.935       318
+
+              accuracy                          0.848      2326
+             macro avg      0.801     0.796     0.798      2326
+          weighted avg      0.847     0.848     0.847      2326
+
+Confusion matrix (rows = true class):
+                             pred Early blight  pred Late blight  pred Septoria leaf spot  pred Yellow leaf curl virus  pred Healthy
+true Early blight                          119                28                       27                           26             0
+true Late blight                            31               278                       28                           36             9
+true Septoria leaf spot                     11                34                      279                           20            10
+true Yellow leaf curl virus                 22                19                       30                         1000             1
+true Healthy                                 4                 7                        9                            1           297
