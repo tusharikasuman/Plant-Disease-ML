@@ -177,6 +177,90 @@ def page_diagnose(models):
 
 
 # ----------------------------------------------------------------------------- page: results
+@st.cache_resource(show_spinner="Loading every model...")
+def get_all_models():
+    from src import all_models
+    return all_models.load_all()
+
+
+def page_compare():
+    from src import all_models
+    st.title("🔬 Compare all models")
+    st.write("Upload one leaf photo and see what **every** model says: the 9 classifiers from Units 1, 2 and 5, "
+             "the neural network and AdaBoost written from scratch (Unit 5), and the Bayesian logistic regression "
+             "(healthy vs diseased).")
+    bundle = get_all_models()
+    if bundle is None:
+        st.warning("The models for this page are not trained yet (about 1-2 minutes, once).")
+        if st.button("Train every model now"):
+            from src import dataset
+            with st.spinner("Training 11 models on 9,302 leaves..."):
+                all_models.train_all(dataset.load_features(), verbose=False)
+            get_all_models.clear()
+            st.rerun()
+        st.caption("Or in the terminal:  `python -m src.all_models`")
+        return
+
+    left, right = st.columns([2, 1])
+    upload = left.file_uploader("Leaf photo (JPG / PNG)", type=["jpg", "jpeg", "png"], key="compare_upload")
+    samples = sorted(config.SAMPLES_DIR.glob("*.jpg"))
+    choice = right.selectbox("...or try a sample leaf", ["-"] + [s.stem.replace("_", " ") for s in samples], key="compare_sample")
+    if upload is not None:
+        data, source = upload.getvalue(), upload.name
+    elif choice != "-":
+        path = samples[[s.stem.replace("_", " ") for s in samples].index(choice)]
+        data, source = path.read_bytes(), path.name
+    else:
+        st.info("⬆️ Upload a leaf photo or pick a sample to start.")
+        return
+
+    img = F.decode_image(data) if data else None
+    if img is None:
+        st.error("That file could not be read as an image.")
+        return
+    with st.spinner("Asking every model..."):
+        table, info = all_models.compare(img, bundle)
+        views = F.segmented_views(img)
+
+    # ---- the leaf
+    c1, c2, c3 = st.columns(3)
+    c1.image(views["image"], caption=f"Uploaded leaf ({source})", width="stretch")
+    c2.image(views["mask"], caption="Leaf found by segmentation (white)", width="stretch")
+    c3.image(views["lesions"], caption=f"Damaged spots in orange: {info['lesion_percent']:.1f}% of the leaf", width="stretch")
+    if not info["leaf_found"]:
+        st.warning("No leaf was detected, so the whole image was used. Every answer below is unreliable.")
+
+    # ---- the verdict
+    v, n = info["diseased_votes"], info["n_models"]
+    verdict = "DISEASED" if v > n / 2 else "HEALTHY" if v < n / 2 else "UNSURE (models split)"
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Verdict (majority of models)", verdict)
+    m2.metric("Models saying DISEASED", f"{v} of {n}")
+    best = table.loc[table["Model"] == "Gradient Boosting"].iloc[0]
+    m3.metric("Best model (Gradient Boosting) says", best["Prediction"], f"{best['Confidence (%)']:.0f}% confident", delta_color="off")
+    if 0 < v < n:
+        st.warning(f"The models disagree: {v} say diseased, {n - v} say healthy. Trust the most accurate models "
+                   "(top of the table) and treat this leaf as uncertain.")
+
+    # ---- every model
+    st.subheader("What each model says")
+    show = table.sort_values("Held-out accuracy (%)", ascending=False)
+    colour = lambda s: [f"color: {VERMILION}; font-weight: 600" if x == "DISEASED" else f"color: {GREEN}; font-weight: 600" for x in s]
+    st.dataframe(show.style.apply(colour, subset=["Healthy or diseased"]).format(
+        {"Confidence (%)": "{:.1f}", "P(healthy) (%)": "{:.1f}", "Held-out accuracy (%)": "{:.1f}"}),
+        hide_index=True, width="stretch")
+    st.caption("Sorted by each model's accuracy on the 2,326 held-out test leaves, so the most reliable models are on top. "
+               "* AdaBoost's confidence is the share of its 300 stumps' weighted votes, so it is always low.")
+
+    fig, ax = plt.subplots(figsize=(8, 0.42 * len(show) + 0.8))
+    s = show.iloc[::-1]
+    bars = ax.barh(s["Model"], s["Confidence (%)"], color=[VERMILION if x == "DISEASED" else GREEN for x in s["Healthy or diseased"]])
+    ax.bar_label(bars, labels=[f"{p}  ({c:.0f}%)" for p, c in zip(s["Prediction"], s["Confidence (%)"])], padding=3, fontsize=8)
+    ax.set_xlim(0, 150); ax.set_xticks([0, 25, 50, 75, 100]); ax.set_xlabel("confidence in its answer (%)")
+    ax.set_title("Each model's answer (red = diseased, green = healthy)", loc="left")
+    st.pyplot(fig, width="stretch"); plt.close(fig)
+
+
 def page_results(models):
     st.title("📊 Model results")
     res = report("classification_results.csv")
@@ -507,7 +591,7 @@ def main():
     with st.sidebar:
         st.markdown("## 🌿 Leaf Doctor")
         st.caption("Plant disease detection & chlorophyll estimation with classical machine learning")
-        page = st.radio("Page", ["Diagnose a leaf", "Ask questions", "Model results", "All graphs", "Bayesian LR", "Unit 5",
+        page = st.radio("Page", ["Diagnose a leaf", "Compare all models", "Ask questions", "Model results", "All graphs", "Bayesian LR", "Unit 5",
                                  "Chlorophyll", "How it works"], label_visibility="collapsed")
         st.divider()
         if models is not None:
@@ -521,6 +605,8 @@ def main():
 
     if page == "Diagnose a leaf":
         page_diagnose(models)
+    elif page == "Compare all models":
+        page_compare()
     elif page == "Ask questions":
         page_ask(models)
     elif page == "Model results":
