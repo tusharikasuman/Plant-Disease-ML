@@ -1,8 +1,7 @@
-# dataset (download from Kaggle, ~2.7 GB) and generated files
+# the leaf photos (PlantVillage ~200 MB, ArabicaLens ~740 MB): download them, see README
 data/
-cache/
-models/*.joblib
-*.npz
+# the trained models (models/*.joblib) and the feature cache (cache/*.npz) ARE in the repository,
+# so the app and the demo run right after cloning, without the photos or retraining
 
 # Python
 __pycache__/
